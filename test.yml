@@ -1,0 +1,67 @@
+---
+- name: "Playbook to test various variables"
+  hosts: all
+  #become: false
+  become: true
+  become_method: sudo
+  gather_facts: true
+ # vars_files example
+  #vars_files:
+    #- "./tf_ansible_vars/ansible_vars.yml"
+  tasks:
+    - name: group_names
+      debug:
+        msg: "{{ group_names }}"
+
+    - name: ansible_hostname
+      debug:
+        msg: "{{ ansible_hostname }}"
+
+    - name: ansible_user
+      debug:
+        msg: "{{ ansible_user }}"
+
+    - name: playbook_dir
+      debug:
+        msg: "{{ playbook_dir }}"
+
+    - name: ansible_env['HOME']
+      debug:
+        msg: "{{ ansible_env['HOME'] }}"
+
+    - name: ansible_os_family
+      debug:
+        msg: "{{ ansible_os_family }}"
+
+    - name: ansible_env['PWD']
+      debug:
+        msg: "{{ ansible_env['PWD'] }}"
+
+    - name: ansible_default_ipv4[address]
+      debug:
+        msg: "{{ ansible_default_ipv4['address'] }}"
+
+    - name: ansible_env['USER']
+      debug:
+        var: ansible_env['USER']
+
+    - name: ansible_env['SUDO_USER']
+      debug:
+        var: ansible_env['SUDO_USER']
+
+    - name: Distribution version
+      debug:
+        var: "{{ ansible_distribution_version }}"
+
+    - name: Get user's primary group name
+      command: "id -gn {{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+      register: primary_group
+      changed_when: false
+
+    - name: Get user's primary group name
+      set_fact:
+        user_primary_group: "{{ primary_group.stdout }}"
+
+    - name: Display user's primary group name
+      debug:
+        var: user_primary_group
