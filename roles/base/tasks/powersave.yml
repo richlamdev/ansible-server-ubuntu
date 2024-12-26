@@ -1,0 +1,32 @@
+---
+# ensure monitor properly sleeps
+- name: powersave | install monitor power save script
+  copy:
+    src: blank.sh
+    dest: "/usr/bin/blank.sh"
+    mode: 0755
+    owner: root
+    group: root
+
+# do not restart this service, next reboot will pick up this change
+- name: powersave | do nothing when laptop lid closes
+  copy:
+    src: logind.conf
+    dest: "/etc/systemd/logind.conf"
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Check if /etc/gdm3 directory exists
+  stat:
+    path: /etc/gdm3
+  register: gdm3_directory
+
+- name: powersave | enable xorg as default - just say no to wayland
+  copy:
+    src: custom.conf
+    dest: "/etc/gdm3/custom.conf"
+    mode: 0644
+    owner: root
+    group: root
+  when: gdm3_directory.stat.exists

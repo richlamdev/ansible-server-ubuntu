@@ -1,0 +1,37 @@
+---
+- name: optimize | apt purge avahi, whoopsie, apport, openvpn package
+  apt:
+    name:
+      - avahi-daemon
+      - avahi-utils
+      - whoopsie
+      - apport
+      - openvpn
+    update_cache: true
+    state: absent
+    purge: true
+
+- name: optimize | apt autoclean and autoremove
+  apt:
+    autoremove: true
+    autoclean: true
+  #when: snaps_found.stdout | length > 0
+
+- name: Check if Evolution files exist
+  stat:
+    path: "{{ item }}"
+  loop:
+    - /usr/libexec/evolution-addressbook-factory
+    - /usr/libexec/evolution-calendar-factory
+    - /usr/libexec/evolution-data-server/evolution-alarm-notify
+    - /usr/libexec/evolution-source-registry
+  register: evolution_files
+
+- name: optimize | prevent evolution from starting (running) in background
+  file:
+    path: "{{ item.stat.path }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ evolution_files.results }}"
+  when: item.stat.exists

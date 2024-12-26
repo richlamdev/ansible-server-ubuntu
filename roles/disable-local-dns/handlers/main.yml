@@ -1,0 +1,12 @@
+---
+- name: restart network manager
+  systemd:
+    name: NetworkManager.service
+    enabled: true
+    state: restarted
+
+- name: restart systemd resolved
+  systemd:
+    name: systemd-resolved.service
+    enabled: true
+    state: restarted

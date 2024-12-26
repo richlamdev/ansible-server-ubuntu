@@ -1,0 +1,56 @@
+---
+- name: packages | apt update && apt dist-upgrade *MAY TAKE A LONG TIME*
+  apt:
+    update_cache: true
+    upgrade: dist
+
+# keep alphabetically ordered
+- name: packages | install standard additions to the base install
+  apt:
+    state: latest
+    pkg: "{{ item }}"
+  loop:
+    - bat
+    - clamav
+    - clamav-daemon
+    - curl
+    - fd-find
+    - gimp
+    - graphviz
+    - htop
+    - iperf
+    - meld
+    - net-tools
+    - nmap
+    - p7zip
+    - ranger
+    - ripgrep
+    - rtorrent
+    - silversearcher-ag
+    - sshfs
+    - termshark
+    - tcpdump
+    - tmux
+    - tree
+    - ufw
+    - unrar
+    - unzip
+    # - vim-gtk3  # install by github and compile
+    - virtualbox
+    - vlc
+    - whois
+    - xclip
+  loop_control:
+    label: "{{ item }}"
+  become: yes
+
+- name: packages | apt autoremove & autoclean
+  apt:
+    autoremove: true
+    autoclean: true
+
+- name: packages | enable clamav service
+  systemd:
+    name: clamav-daemon
+    enabled: true
+    state: started

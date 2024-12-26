@@ -1,0 +1,7 @@
+---
+
+- name: installing packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ ufw_packages }}"

@@ -1,0 +1,19 @@
+---
+- name: Ensure snapd is installed
+  apt:
+    name: snapd
+    state: present
+  become: yes
+
+- name: Install Snap packages
+  community.general.snap:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - chromium
+    - multipass
+    - onefetch
+    - slack
+  loop_control:
+    label: "{{ item }}"
+  become: yes
