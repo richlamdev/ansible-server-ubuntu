@@ -19,23 +19,6 @@ google() {
   xdg-open "https://www.google.com/search?q=$*" >/dev/null 2>&1 &
 }
 
-# minikube autocomplete
-#source <(minikube completion bash)
-
-# kubectl autocomplete
-source <(kubectl completion bash)
-alias k='kubectl'
-complete -o default -F __start_kubectl k
-
-# aws autocomplete
-complete -C '/usr/local/bin/aws_completer' aws
-
-# terraform autocomplete
-complete -C /usr/bin/terraform terraform
-
-# vagrant command completion (start)
-. /opt/vagrant/embedded/gems/gems/vagrant-2.4.2/contrib/bash/completion.sh
-
 # pipx autocomplete
 eval "$(register-python-argcomplete pipx)"
 

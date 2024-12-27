@@ -19,6 +19,3 @@
 
 - name: keychron tasks
   import_tasks: keychron.yml
-
-- name: autostart tasks
-  import_tasks: autostart.yml
