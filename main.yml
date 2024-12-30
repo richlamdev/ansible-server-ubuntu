@@ -29,12 +29,9 @@
     - auto-update
     - base
     - docker-cli-only
-    - gh_cli
-    - trivy
     - ufw
     - role: vim
       become: false
     - role: env
       become: false
     - disable-local-dns
-    # - yubico
