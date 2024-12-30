@@ -9,6 +9,7 @@ HISTIGNORE="&:[ ]*:exit:ls *:bg:fg:history:clear:pwd:cd *"
 alias cbc='xclip -sel clip'
 alias cbp='xclip -sel clip -o'
 alias dateu='date && date -u'
+alias ipa='ip -c a'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'

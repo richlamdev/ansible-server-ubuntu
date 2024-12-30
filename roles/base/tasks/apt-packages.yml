@@ -13,21 +13,19 @@
     - bat
     - clamav
     - clamav-daemon
-    - curl
+    - curl          # to be removed
+    - dnsutils
     - fd-find
-    - iperf
-    - net-tools
-    - nmap
-    - p7zip
     - ripgrep
     - silversearcher-ag
     - sshfs
     - tmux
     - tree
     - ufw
+    - unbound
     - unrar
     - unzip
-    # - vim-gtk3  # install by github and compile
+    - vim
     - xclip
   loop_control:
     label: "{{ item }}"
