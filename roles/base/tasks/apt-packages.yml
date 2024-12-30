@@ -10,7 +10,6 @@
     state: latest
     pkg: "{{ item }}"
   loop:
-    - bat
     - clamav
     - clamav-daemon
     - curl          # to be removed
@@ -18,13 +17,10 @@
     - fd-find
     - ripgrep
     - silversearcher-ag
-    - sshfs
     - tmux
     - tree
     - ufw
     - unbound
-    - unrar
-    - unzip
     - vim
     - xclip
   loop_control:
