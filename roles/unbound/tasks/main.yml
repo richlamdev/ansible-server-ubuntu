@@ -1,0 +1,6 @@
+---
+- name: static file configuration
+  import_tasks: static.yml
+
+- name: dynamic file configuration
+  import_tasks: dynamic.yml
