@@ -1,0 +1,45 @@
+---
+- name: Update APT package cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600  # Cache is valid for 1 hour
+
+- name: Install Unbound and ca-certificates
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - unbound
+    - unbound-anchor
+    - ca-certificates
+  loop_control:
+    label: "{{ item }}"
+
+- name: Ensure /var/lib/unbound directory exists
+  file:
+    path: /var/lib/unbound
+    state: directory
+    owner: unbound
+    group: unbound
+    mode: '0755'
+
+- name: Download the latest root.hints file
+  get_url:
+    url: https://www.internic.net/domain/named.root
+    dest: /var/lib/unbound/root.hints
+    owner: unbound
+    group: unbound
+    mode: '0644'
+    force: yes
+
+- name: Install root.key from IANA using unbound-anchor
+  shell: '/usr/sbin/unbound-anchor -a /var/lib/unbound/root.key'
+  register: rootkey
+  failed_when: rootkey.rc not in [0, 1]
+  changed_when: "'success' in rootkey.stdout or rootkey.rc == 0"
+
+- name: Ensure Unbound service is enabled and running
+  systemd:
+    name: unbound
+    enabled: yes
+    state: started
