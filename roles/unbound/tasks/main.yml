@@ -4,3 +4,6 @@
 
 - name: dynamic file configuration
   import_tasks: dynamic.yml
+
+- name: ufw configuration
+  import_tasks: ufw.yml
