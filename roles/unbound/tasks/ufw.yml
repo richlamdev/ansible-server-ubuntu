@@ -1,0 +1,16 @@
+---
+- name: allow UDP on port 53 for DNS (192.168.x.x only)
+  ufw:
+    rule: allow
+    port: '53'
+    proto: udp
+    from: 192.168.0.0/16
+  notify: reload UFW
+
+- name: allow TCP on port 53 for DNS (192.168.x.x only)
+  ufw:
+    rule: allow
+    port: '53'
+    proto: tcp
+    from: 192.168.0.0/16
+  notify: reload UFW
