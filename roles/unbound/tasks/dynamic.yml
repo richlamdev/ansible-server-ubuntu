@@ -1,15 +1,8 @@
 ---
-# - name: Set _unbound user as owner for /var/unbound/etc folder
-#   file:
-#    path: /var/unbound/etc
-#    owner: _unbound
-#    group: "wheel"
-#    mode: "0755"
-
 - name: deploy unbound.conf template configuration file
   template:
     src: unbound.conf.j2
-    dest: "/etc/unbound/"
+    dest: "/etc/unbound/unbound.conf.d/unbound.conf"
     mode: "0644"
     owner: "root"
     group: "root"
