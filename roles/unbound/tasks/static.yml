@@ -38,6 +38,14 @@
   failed_when: rootkey.rc not in [0, 1]
   changed_when: "'success' in rootkey.stdout or rootkey.rc == 0"
 
+- name: Change ownership and group of root.key to unbound
+  file:
+    path: /var/lib/unbound/root.key
+    owner: unbound
+    group: unbound
+    mode: '0640'
+  when: rootkey.rc in [0, 1]
+
 - name: Ensure Unbound service is enabled and running
   systemd:
     name: unbound

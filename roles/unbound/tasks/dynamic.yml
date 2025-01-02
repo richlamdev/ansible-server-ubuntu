@@ -1,4 +1,17 @@
 ---
+- name: Find all files from /etc/unbound/unbound.conf.d
+  find:
+    paths: /etc/unbound/unbound.conf.d
+    file_type: file
+  register: unbound_conf_files
+
+- name: Delete found files in /etc/unbound/unbound.conf.d
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ unbound_conf_files.files }}"
+  when: unbound_conf_files.matched > 0
+
 - name: deploy unbound.conf template configuration file
   template:
     src: unbound.conf.j2

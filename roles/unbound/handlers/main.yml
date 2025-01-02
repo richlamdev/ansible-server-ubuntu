@@ -3,3 +3,6 @@
   service:
     name: unbound
     state: restarted
+
+- name: reload UFW
+  command: ufw reload

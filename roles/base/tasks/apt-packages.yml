@@ -21,7 +21,6 @@
     - tree
     - ufw
     - vim
-    - xclip
   loop_control:
     label: "{{ item }}"
   become: yes
