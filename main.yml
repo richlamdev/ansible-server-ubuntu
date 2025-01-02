@@ -30,8 +30,9 @@
     - base
     - docker-cli-only
     - ufw
-    - role: vim
-      become: false
+    - unbound
+      #- role: vim
+      #become: false
     - role: env
       become: false
     - disable-local-dns
