@@ -28,7 +28,6 @@
   roles:
     - auto-update
     - base
-    - docker-cli-only
     - ufw
     - unbound
       #- role: vim
