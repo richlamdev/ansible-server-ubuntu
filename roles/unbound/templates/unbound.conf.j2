@@ -1,8 +1,7 @@
-# /etc/unbound/unbound.conf
+# /etc/unbound/unbound.conf.d/unbound.conf
 
 server:
         verbosity: 1
-        #logfile: "/var/unbound/etc/unbound.log"
         #logfile: "/var/log/unbound.log"
         use-syslog: yes     #overrides logfile setting above
         log-queries: yes
@@ -20,7 +19,9 @@ server:
 
         access-control: 0.0.0.0/0 refuse
         access-control: ::0/0 refuse
-        access-control: {{ network_addr }}/24 allow
+        #access-control: {{ network_addr }}/24 allow
+        # allow all local 192.168.x.x subnets to query
+        access-control: 192.168.0.0/16 allow
         access-control: 127.0.0.0/8 allow_snoop
         hide-identity: yes
         hide-version: yes
@@ -42,23 +43,54 @@ server:
         cache-min-ttl: 3600
         cache-max-ttl: 86400
 
+        # prevent potential DNS rebind attacks
+
+        # RFC 1918 - Private IPv4 address space
         private-address: 192.168.0.0/16
         private-address: 172.16.0.0/12
         private-address: 10.0.0.0/8
 
-        private-address: 0.0.0.0/8
-        private-address: 100.64.0.0/10
+        # Loopback Addresses (IPv4 and IPv6)
         private-address: 127.0.0.0/8
+        private-address: ::1
+
+        # Link-local Addresses (IPv4 and IPv6)
         private-address: 169.254.0.0/16
-        private-address: 172.16.0.0/12
+        private-address: fe80::/10
+
+        # Carrier-Grade NAT (RFC 6598)
+        private-address: 100.64.0.0/10
+
+        # Reserved and Special-Use IPv4 and IPv6 Addresses
         private-address: 192.0.0.0/24
+        private-address: 198.18.0.0/15
+        private-address: 240.0.0.0/4
+        private-address: 0.0.0.0/8
+
+        # Reserved Multicast Addresses
+        private-address: 224.0.0.0/4
+        private-address: ff00::/8
+
+        # RFC 4193 - Unique Local IPv6 Addresses (ULA)
+        private-address: fd00::/8
+
+        # RFC 3879 - Deprecated IPv6 Site-Local Addresses
+        private-address: fec0::/10
+
+        # IPv6 Discard Prefix (RFC 6666)
+        private-address: 100::/64
+
+        # IPv6 Benchmarking Prefix (RFC 2544)
+        private-address: 2001:2::/48
+
+        # IPv6 Documentation Prefixes (RFC 3849)
+        private-address: 2001:db8::/32
+
+        # Special-use IP ranges
         private-address: 192.0.2.0/24
         private-address: 192.88.99.0/24
-        private-address: 198.18.0.0/15
         private-address: 198.51.100.0/24
         private-address: 203.0.113.0/24
-        private-address: 224.0.0.0/4
-        private-address: 240.0.0.0/4
         private-address: 255.255.255.255/32
 
 
