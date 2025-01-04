@@ -12,19 +12,47 @@
   debug:
     var: dns_default_status.changed
 
-- name: restart network manager
+- name: Ensure NetworkManager is enabled and active
   systemd:
     name: NetworkManager.service
     enabled: true
-    state: restarted
-  when: dns_default_status.changed
+    state: started
 
-- name: restart systemd resolved
+- name: Ensure systemd-resolved is enabled and active
   systemd:
     name: systemd-resolved.service
     enabled: true
-    state: restarted
+    state: started
+
+- name: Restart NetworkManager with validation
+  command: systemctl restart NetworkManager.service
+  register: restart_networkmanager
+  retries: 3
+  delay: 5
+  until: restart_networkmanager.rc == 0
   when: dns_default_status.changed
+
+- name: Restart systemd-resolved with validation
+  command: systemctl restart systemd-resolved.service
+  register: restart_resolved
+  retries: 3
+  delay: 5
+  until: restart_resolved.rc == 0
+  when: dns_default_status.changed
+
+# - name: restart network manager
+#   systemd:
+#     name: NetworkManager.service
+#     enabled: true
+#     state: restarted
+#   when: dns_default_status.changed
+
+# - name: restart systemd resolved
+#   systemd:
+#     name: systemd-resolved.service
+#     enabled: true
+#     state: restarted
+#   when: dns_default_status.changed
 
 - name: Ensure DNS resolution is functional
   command: "dig example.com +short"
