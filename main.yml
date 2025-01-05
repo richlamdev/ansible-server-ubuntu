@@ -30,6 +30,7 @@
     - base
     - ufw
     - unbound
+    - unbound-adblock
       #- role: vim
       #become: false
     - role: env

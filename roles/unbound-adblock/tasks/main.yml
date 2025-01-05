@@ -1,0 +1,127 @@
+---
+- name: Ensure _adblock user exists
+  user:
+    name: "_adblock"
+    shell: /sbin/nologin
+    home: /var/empty
+    create_home: false
+    password_lock: true
+    state: present
+
+- name: Copy unbound-adblock.sh to target host
+  copy:
+    src: unbound-adblock.sh
+    dest: /usr/local/bin/unbound-adblock
+    owner: root
+    group: bin
+    mode: '0755'
+
+- name: Ensure /etc/unbound/adblock.rpz exists with correct permissions
+  copy:
+    dest: /etc/unbound/adblock.rpz
+    content: ''
+    owner: _adblock
+    group: root
+    mode: '0644'
+    force: yes
+
+- name: Ensure /var/log/unbound-adblock directory exists
+  file:
+    path: /var/log/unbound-adblock
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure /var/log/unbound-adblock/unbound-adblock.log exists with correct permissions
+  copy:
+    dest: /var/log/unbound-adblock/unbound-adblock.log
+    content: ''
+    owner: _adblock
+    group: root
+    mode: '0640'
+    force: yes
+
+- name: Ensure /var/log/unbound-adblock/unbound-adblock.log.0.gz exists with correct permissions
+  copy:
+    dest: /var/log/unbound-adblock/unbound-adblock.log.0.gz
+    content: ''
+    owner: _adblock
+    group: root
+    mode: '0640'
+    force: yes
+
+- name: Grant specific sudo permissions to _adblock user for unbound-control
+  become: yes
+  lineinfile:
+    path: /etc/sudoers.d/_adblock_unbound
+    create: yes
+    content: |
+      _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q status
+      _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q flush_zone unbound-adblock
+      _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q auth_zone_reload unbound-adblock
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+
+- name: Check if unbound-control.conf exists to determine if unbound-control-setup has been run
+  stat:
+    path: /etc/unbound/unbound-control.conf
+  register: unbound_control_conf
+
+- name: Run unbound-control-setup if unbound-control.conf does not exist
+  become: yes
+  command: unbound-control-setup
+  when: unbound_control_conf.stat.exists == False
+
+- name: Add RPZ and remote-control configuration to unbound.conf
+  become: yes
+  blockinfile:
+    path: /etc/unbound/unbound.conf.d/unbound.conf  # Adjust path as needed
+    block: |
+      # Required modules for RPZ
+      module-config: "respip validator iterator"
+      rpz:
+         name: "unbound-adblock"
+         zonefile: "/etc/unbound/adblock.rpz"
+         rpz-log: yes
+         rpz-log-name: "unbound-adblock"
+
+      remote-control:
+          control-enable: yes
+          control-interface: 127.0.0.1
+    insertbefore: "forward-zone"  # Insert before the 'forward-zone' section
+    create: yes
+
+- name: Ensure Unbound is reloaded after configuration changes
+  become: yes
+  service:
+    name: unbound
+    state: reloaded
+
+- name: Run the unbound-adblock script to parse and load the adblock ruleset
+  become: yes
+  become_user: _adblock
+  command: "/usr/local/bin/unbound-adblock -O linux"
+  environment:
+    HOME: /var/empty  # Ensure the home directory is set to the correct location for _adblock user
+
+- name: Add a cron job for _adblock to run unbound-adblock every morning at 5:30 AM
+  become: yes
+  cron:
+    name: "Run unbound-adblock"
+    user: "_adblock"
+    minute: "30"
+    hour: "5"
+    job: "/usr/local/bin/unbound-adblock -O linux"
+    state: present
+
+# Define the handler to reload Unbound
+# handlers:
+#   - name: reload unbound
+#     become: yes
+#     service:
+#       name: unbound
+#       state: reloaded
+
