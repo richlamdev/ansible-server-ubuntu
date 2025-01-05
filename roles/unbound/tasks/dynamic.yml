@@ -5,21 +5,32 @@
     file_type: file
   register: unbound_conf_files
 
-- name: Delete found files in /etc/unbound/unbound.conf.d
-  file:
-    path: "{{ item.path }}"
-    state: absent
-  loop: "{{ unbound_conf_files.files }}"
-  when: unbound_conf_files.matched > 0
+- name: Check if unbound.conf already exists
+  stat:
+    path: /etc/unbound/unbound.conf.d/unbound.conf
+  register: unbound_conf_stat
 
-- name: deploy unbound.conf template configuration file
+- name: Warn that the unbound.conf file already exists, and the template will not be copied
+  debug:
+    msg: "Warning: unbound.conf file found, the template will not be copied over."
+  when: unbound_conf_stat.stat.exists == True
+
+- name: Deploy unbound.conf template configuration file if it does not exist
   template:
     src: unbound.conf.j2
     dest: "/etc/unbound/unbound.conf.d/unbound.conf"
     mode: "0644"
     owner: "root"
     group: "root"
+  when: unbound_conf_stat.stat.exists == False  # Only deploy if the file does not exist
   notify: reload unbound
+
+- name: Delete other found files in /etc/unbound/unbound.conf.d
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ unbound_conf_files.files }}"
+  when: unbound_conf_files.matched > 0 and item.path != '/etc/unbound/unbound.conf.d/unbound.conf'  # Skip the unbound.conf file
 
 - name: restart unbound service unconditionally
   meta: flush_handlers
