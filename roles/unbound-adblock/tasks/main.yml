@@ -1,5 +1,14 @@
 ---
-- name: Ensure _adblock user exists
+# - name: Ensure _adblock user exists
+#   user:
+#     name: "_adblock"
+#     shell: /sbin/nologin
+#     home: /var/empty
+#     create_home: false
+#     password_lock: true
+#     state: present
+
+- name: Ensure _adblock user exists and add to unbound group
   user:
     name: "_adblock"
     shell: /sbin/nologin
@@ -7,6 +16,8 @@
     create_home: false
     password_lock: true
     state: present
+    group: unbound
+    append: yes
 
 - name: Copy unbound-adblock.sh to target host
   copy:
@@ -83,20 +94,6 @@
     group: root
     mode: '0440'
     validate: 'visudo -cf %s'
-
-# - name: Grant specific sudo permissions to _adblock user for unbound-control
-#   become: yes
-#   lineinfile:
-#     path: /etc/sudoers.d/_adblock_unbound
-#     create: yes
-#     content: |
-#       _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q status
-#       _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q flush_zone unbound-adblock
-#       _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q auth_zone_reload unbound-adblock
-#     owner: root
-#     group: root
-#     mode: '0440'
-#     validate: 'visudo -cf %s'
 
 - name: Check if unbound-control.conf exists to determine if unbound-control-setup has been run
   stat:
