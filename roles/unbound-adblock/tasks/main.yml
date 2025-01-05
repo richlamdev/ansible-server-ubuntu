@@ -102,21 +102,22 @@
 
 - name: Run unbound-control-setup if unbound-control.conf does not exist
   become: yes
+  become_user: unbound
   command: unbound-control-setup
   when: unbound_control_conf.stat.exists == False
 
-- name: Ensure correct ownership and permissions for unbound control key and certificate
-  file:
-    path: "{{ item }}"
-    owner: root
-    group: unbound
-    mode: '0640'
-    state: file
-  loop:
-    - /etc/unbound/unbound_control.key
-    - /etc/unbound/unbound_control.pem
-  loop_control:
-    label: "Setting permissions on {{ item }}"
+# - name: Ensure correct ownership and permissions for unbound control key and certificate
+#   file:
+#     path: "{{ item }}"
+#     owner: root
+#     group: unbound
+#     mode: '0640'
+#     state: file
+#   loop:
+#     - /etc/unbound/unbound_control.key
+#     - /etc/unbound/unbound_control.pem
+#   loop_control:
+#     label: "Setting permissions on {{ item }}"
 
 - name: Add RPZ and remote-control configuration to unbound.conf
   become: yes
@@ -145,6 +146,7 @@
 
 - name: Wait until Unbound is fully ready after reload
   become: yes
+  become_user: unbound
   command: "unbound-control status"
   register: unbound_status
   retries: 5
