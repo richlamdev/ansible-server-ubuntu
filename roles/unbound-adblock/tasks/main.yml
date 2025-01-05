@@ -143,6 +143,16 @@
     name: unbound
     state: reloaded
 
+- name: Wait until Unbound is fully ready after reload
+  become: yes
+  command: "unbound-control status"
+  register: unbound_status
+  retries: 5
+  delay: 2
+  until: unbound_status.rc == 0
+  failed_when: "'error:' in unbound_status.stderr"
+  changed_when: false
+
 - name: Run the unbound-adblock script to parse and load the adblock ruleset
   become: yes
   become_user: _adblock
