@@ -15,8 +15,6 @@
     - curl          # to be removed
     - dnsutils
     - fd-find
-    - ripgrep
-    - silversearcher-ag
     - tmux
     - tree
     - ufw
