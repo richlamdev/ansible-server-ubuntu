@@ -56,14 +56,47 @@
   lineinfile:
     path: /etc/sudoers.d/_adblock_unbound
     create: yes
-    content: |
-      _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q status
-      _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q flush_zone unbound-adblock
-      _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q auth_zone_reload unbound-adblock
+    line: "_adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q status"
     owner: root
     group: root
     mode: '0440'
     validate: 'visudo -cf %s'
+
+- name: Grant specific sudo permissions to _adblock user for flush_zone
+  become: yes
+  lineinfile:
+    path: /etc/sudoers.d/_adblock_unbound
+    create: yes
+    line: "_adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q flush_zone unbound-adblock"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+
+- name: Grant specific sudo permissions to _adblock user for auth_zone_reload
+  become: yes
+  lineinfile:
+    path: /etc/sudoers.d/_adblock_unbound
+    create: yes
+    line: "_adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q auth_zone_reload unbound-adblock"
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+
+# - name: Grant specific sudo permissions to _adblock user for unbound-control
+#   become: yes
+#   lineinfile:
+#     path: /etc/sudoers.d/_adblock_unbound
+#     create: yes
+#     content: |
+#       _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q status
+#       _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q flush_zone unbound-adblock
+#       _adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q auth_zone_reload unbound-adblock
+#     owner: root
+#     group: root
+#     mode: '0440'
+#     validate: 'visudo -cf %s'
 
 - name: Check if unbound-control.conf exists to determine if unbound-control-setup has been run
   stat:
