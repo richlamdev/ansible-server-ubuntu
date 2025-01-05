@@ -105,6 +105,19 @@
   command: unbound-control-setup
   when: unbound_control_conf.stat.exists == False
 
+- name: Ensure correct ownership and permissions for unbound control key and certificate
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: unbound
+    mode: '0640'
+    state: file
+  loop:
+    - /etc/unbound/unbound_control.key
+    - /etc/unbound/unbound_control.pem
+  loop_control:
+    label: "Setting permissions on {{ item }}"
+
 - name: Add RPZ and remote-control configuration to unbound.conf
   become: yes
   blockinfile:
