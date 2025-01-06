@@ -106,6 +106,8 @@
   loop:
     - /etc/unbound/unbound_control.key
     - /etc/unbound/unbound_control.pem
+    - /etc/unbound/unbound_server.key
+    - /etc/unbound/unbound_server.pem
   loop_control:
     label: "Setting permissions on {{ item }}"
 
