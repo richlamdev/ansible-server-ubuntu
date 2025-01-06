@@ -16,7 +16,7 @@
     create_home: false
     password_lock: true
     state: present
-    group: unbound
+    groups: unbound
     append: yes
 
 - name: Copy unbound-adblock.sh to target host
@@ -102,7 +102,6 @@
 
 - name: Run unbound-control-setup if unbound-control.conf does not exist
   become: yes
-  become_user: unbound
   command: unbound-control-setup
   when: unbound_control_conf.stat.exists == False
 
@@ -142,7 +141,7 @@
   become: yes
   service:
     name: unbound
-    state: reloaded
+    state: restarted
 
 - name: Wait until Unbound is fully ready after reload
   become: yes
