@@ -1,0 +1,149 @@
+###################################################################
+# unbound-adblock 0.5 OpenBSD Installation Instructions 
+# Copyright 2018-2021 Jordan Geoghegan <jordan@geoghegan.ca>
+###################################################################
+
+###################################################################
+# Table of Contents:
+###################################################################
+
+* Unwind Configuration Notes
+
+* Fresh Install Instructions
+
+* Post Install Notes
+
+
+###################################################################
+# Notes:
+###################################################################
+
+1) This guide assumes you know how to setup unwind. If not,
+   there are plenty of online guides to setting up unwind.
+
+OpenBSD Unwind Quick Start:
+
+	# rcctl enable unwind
+	# rcctl start unwind
+	# echo 'supersede domain-name-servers 127.0.0.1;' > /etc/dhclient.conf
+	# sh /etc/netstart
+
+
+###################################################################
+# Fresh Installation Guide 
+###################################################################
+
+2) Download script:
+	$ ftp https://geoghegan.ca/pub/unbound-adblock/0.5/unbound-adblock.sh
+
+3) Create a new user (we'll call ours "_adblock"):
+   The user should be created with a default shell of "nologin", home folder
+   set to /var/empty/ with no password specified (disables password logins)
+	# useradd -s /sbin/nologin -d /var/empty _adblock
+
+4) Install script with appropriate permissions:
+	# install -m 755 -o root -g bin unbound-adblock.sh /usr/local/bin/unbound-adblock
+
+4.b) OPTIONAL: Install RipGrep and mawk for greatly improved performance:
+     Note: RipGrep is not available on all CPU architectures, use ggrep if affected.
+	# pkg_add ripgrep mawk
+
+5) Create required files:
+	# install -m 644 -o _adblock -g wheel /dev/null /var/db/unwind-adblock.db
+	# install -d -o root -g wheel -m 755 /var/log/unbound-adblock
+	# install -o _adblock -g wheel -m 640 /dev/null /var/log/unbound-adblock/unbound-adblock.log
+	# install -o _adblock -g wheel -m 640 /dev/null /var/log/unbound-adblock/unbound-adblock.log.0.gz
+
+6) Give user '_adblock' strict doas permission for the exact commands the 
+   script needs run as superuser. NOTE: Unlike 'sudo', _ALL_ users must be
+   explicitly granted permission to use doas, even the root user.
+   Note: unbound-adblock 0.5 errata 004 changed the doas permissions to be less permissive and more portable 
+ 
+	$ cat /etc/doas.conf
+	...
+	permit root
+	permit nopass _adblock cmd /usr/sbin/unwindctl args reload
+	...
+
+7) Add blocklist to unwind.conf:
+	# vi /etc/unwind.conf
+	...
+	block list "/var/db/unwind-adblock.db" log
+	...
+
+8) Run script manually to parse and load the adblock ruleset:
+	# doas -u _adblock unbound-adblock -o unwind -O openbsd
+	  unwind(ok)
+	
+10) Edit _adblock users crontab to run unbound-adblock every night:
+	# crontab -u _adblock -e
+	...
+	~ 0~1 * * *	-s unbound-adblock -o unwind -O openbsd
+	...
+
+NOTE: If you're running an OpenBSD release older than 6.7, you'll have to use a workaround:
+      ...
+      @daily	sleep $(echo $((RANDOM\%7200+1))) ; unbound-adblock -o unwind -O openbsd
+      ...
+      ---
+      Please see the crontab(5) man page for further info
+
+
+Yay! unbound-adblock is now installed!
+
+With the nightly cron job, the list will be regularly updated with
+the latest known bad hosts.
+
+Please read the man page for information on how to configure unbound-adblock.
+The manpage can be found here: https://www.geoghegan.ca/pub/unbound-adblock/0.5/man/man.txt
+
+To receive notification of new unbound-adblock releases and updates please send an email
+to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-adblock"
+
+
+###################################################################
+# Post Install Notes:
+###################################################################
+
+X) To add custom rules or enable features, or add alternate blocklists, 
+   See the "User Configuration Area" located at the top of the script.
+   This area serves as a built in config file, so please feel free to 
+   edit it and experiment with all the features available within.
+   ---
+   Note: Most options can also be configured from the command line
+
+
+X) Regarding Cron Jobs:
+   Over the past year I've noticed a number of list host servers
+   going down at midnight in populated timezones (ie West Coast,
+   East Coast and Western Europe). To be respectful (and to avoid
+   overloading list providers servers) we have cron jobs 
+   scheduled to run at a random time within a defined interval.
+   ---
+   With the new default cron job, unbound-adblock will be run every 
+   night at some point between midnight and 2AM, and thus 
+   distributing the load of thousands of queries from numerous
+   users over a 2 hour period rather than a matter of seconds.
+
+X) If you are trying to use very large blocklists, you may need
+   to increase the users limits in /etc/login.conf. You may also
+   need to increase the number of available file descriptors.
+
+X) If you would like to update unbound-adblock blocklists at a more frequent
+   interval you can use a modified cron job:
+   ---
+   It is essential that you make use of the crontab randomization feature to
+   ensure use of unbound-adblock remains respecful of blocklist provider resources.
+   ---
+   The following example runs unbound-adblock every 3 hours at a random minute 
+   (this avoids flooding the server with traffic at exactly XX:00)
+   ---
+   Run unbound-adblock every 3 hours Example: (you can change '/3' to '/4' to run every 4 hours)
+	Note: Use of the '-s' switch prevents 2 instances of unbound-adblock from being run 
+	at the same time - which is a good thing. 
+
+	# crontab -u _adblock -e
+	...
+	~ */3 * * *	-s unbound-adblock -o unwind -O openbsd
+	...
+
