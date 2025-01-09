@@ -1,19 +1,19 @@
-# Ansible Playbook for configuring Ubuntu Desktop
+# Ansible Playbook for configuring Ubuntu Server (minimal)
 
 ## Introduction
 
-This is a collection of roles and configuarions I use for my Ubuntu
-desktop/laptop deployment.
+This is a collection of roles and configuarions I use for Ubuntu Server
+deployment.
 
-This Playbook is designed and tested for Ubunutu 24.04 LTS.  This playbook may
-not work on older versions of Ubuntu without modification.
+This Playbook is designed and tested for Ubuntu Server 24.04.1 LTS.  This
+playbook may not work on older versions of Ubuntu without modification.
 
 
 ## Requirements
 
 1) Basic knowledge of Ansible
 
-2) Ubuntu 24.04 (may work on other apt based distros with modification)
+2) Ubuntu Server 24.04.1 (may work on other apt based distros with modification)
 
 3) Software: ansible, git, openssh-server, vim-gtk3 (vim or vim-gtk3 is not
 strictly required, but is required if the vim role is executed)
@@ -30,7 +30,7 @@ below by \<username\> belongs to the sudo group.  Additionally, this assumes
 the user's primary group on the host and target machine(s) are the same.*
 
 1. Install required software for this playbook.\
-`sudo apt update && sudo apt install ansible git openssh-server vim-gtk3 -y`
+`sudo apt update && sudo apt install ansible git vim -y`
 `ansible-galaxy collection install community.general`
 
 2. Clone ansible-desktop-ubuntu repo.\
@@ -90,31 +90,10 @@ Additional information for the following roles:
     This primitive implementation achieves a similar effect.
   * This role is for any desktop/laptop that requires operating 24/7.
   * unfortunately there is no method to ensure reboots are triggered when
-    required
-
-* aws
-  * installs [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-    and [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) via zip archive from aws
-  * this majority of this role ignores changes; it's not truly idempotent,
-    due to not using a built-in ansible module to handle installation
-  * refer to System Updates section for manual (script) updating
+    required, at this time.
 
 * base
   * packages.yml - list of packages to install via apt
-  * dev-packages.yml - list of development packages to install via apt and pipx
-    * some of the development packages are installed using pipx where possible
-      due to [PEP 668](https://peps.python.org/pep-0668/)
-    * primarily installs pipx binary packages for coding/development
-       * [bandit](https://github.com/PyCQA/bandit)
-       * [black](https://github.com/psf/black) (needed for VIM ALE plugin)
-       * [flake8](https://github.com/PyCQA/flake8) (needed for VIM ALE plugin)
-       * [glances](https://github.com/nicolargo/glances)
-       * [pre-commit](https://github.com/pre-commit/pre-commit)
-       * [pytest](https://github.com/pytest-dev/pytest)
-       * [ruff](https://github.com/charliermarsh/ruff) (needed for VIM ALE plugin)
-       * [yamllint](https://github.com/adrienverge/yamllint) (needed for VIM ALE plugin)
-       * [yamlfix](https://github.com/lyz-code/yamlfix) (needed for VIM ALE plugin)
-       * [yamlfmt](https://github.com/google/yamlfmt) (needed for VIM ALE plugin)
   * keychron.yml - enables keychron keyboard shortcuts
   * autostart.yml - enables autostart of applications
   * authentication.yml - configures ssh server and client.
@@ -129,43 +108,6 @@ Additional information for the following roles:
     (a delay could be added, but that adds unnecessary execution time for the
     playbook)
 
-*NB: install either docker-cli-only OR docker-desktop depending on your
-requirements*
-
-* docker-cli-only
-  * installs all docker engine requirements for CLI use only.  You may
-    experience conflicts if you install docker-desktop as well.
-  * installs following:
-    * docker-ce-cli
-    * containerd.io
-    * docker-compose
-    * docker-compose-plugin
-  * creates docker group and adds the current user to it
-
-* docker-desktop-dependency
-  * installs docker-ce-cli (required for Docker Desktop)
-  * creates docker group and adds the current user to it
-  * install [docker-desktop](https://docs.docker.com/desktop/install/linux-install/) for remainder of local docker setup
-  * NOTE: At the time of this writing, Docker is not yet officially supported
-          on Ubuntu 24.04 LTS.  Follow the instructions under the
-          [prerequisites section](https://docs.docker.com/desktop/install/ubuntu/#prerequisites)
-
-      Short version, either execute this on each reboot, before executing
-      Docker Desktop
-      `sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0`
-      or edit (create) this file /etc/sysctl.d/99-docker.conf
-      `echo "kernel.apparmor_restrict_unprivileged_userns=0" > /etc/sysctl.d/99-docker.conf`
-
-      Apply the change immediately by executing `sudo sysctl --system` or reboot
-
-  * The kernel.apparmor_restrict_unprivileged_userns=0 setting is now applied
-    with the docker role
-
-  * Additional references:
-    * [Github Issue #209](https://github.com/docker/desktop-linux/issues/209)
-    * [reddit thread](https://www.reddit.com/r/docker/comments/1c9rzxz/cannot_get_docker_desktop_to_start_on_ubuntu_2404/)
-    * [restricted unprivileged user namespace](https://ubuntu.com/blog/ubuntu-23-10-restricted-unprivileged-user-namespaces)
-
 * env
   * setups personal preferences for bash shell
   * fzf is required for [fzf.vim](https://github.com/junegunn/fzf.vim)
@@ -176,6 +118,17 @@ requirements*
 
 * ufw
   * disables incoming ports, except port 22 (limit inbound connections port 22)
+
+* unbound
+  * installs and configures unbound DNS server
+  * enables DNSSEC
+  * enables DNS-over-TLS via Quad9, CloudFlare, Mulvadd, Adguard DNS service
+    providers
+
+* unbound-adblock
+  * all credit for this role goes to [Jordan Geoghegan](https://www.geoghegan.ca/about.html).  I did not write this,
+    I only transferred the implementation from Bash to Ansible.
+  * Refer to Unbound Adblock [webpage](https://www.geoghegan.ca/unbound-adblock.html)
 
 * vim
   * installs customization only, does not install vim

@@ -1,0 +1,285 @@
+###################################################################
+# unbound-adblock 0.5 DragonflyBSD Installation Instructions 
+# Copyright 2018-2021 Jordan Geoghegan <jordan@geoghegan.ca>
+###################################################################
+
+###################################################################
+# Table of Contents:
+###################################################################
+
+* Unbound Configuration Notes
+
+* Upgrade Instructions (upgrade from 0.4)
+
+* Fresh Install Instructions
+
+* Post Install Notes
+
+
+###################################################################
+# Notes:
+###################################################################
+
+1) This guide assumes you know how to setup Unbound. If not,
+   there are plenty of online guides to setting up Unbound.
+
+DragonflyBSD Unbound Quick Start:
+
+	-- Install unbound
+	# pkg install unbound
+
+	-- Fetch and install example unbound config:
+	$ fetch https://www.geoghegan.ca/pub/unbound-adblock/0.5/unbound.conf.example
+	# install -m 644 -o root -g unbound unbound.conf.example /usr/local/etc/unbound/unbound.conf
+
+	-- Configure and enable 'unbound-control':
+	# unbound-control-setup
+
+	-- Modify unbound.conf to suit your needs:
+	# vi /usr/local/etc/unbound/unbound.conf
+
+	-- Enable and Start
+	# echo 'unbound_enable="YES"' >> /etc/rc.conf
+	# service unbound start
+
+
+###################################################################
+# Upgrade from unbound-adblock 0.4 
+###################################################################
+
+1) Download updated script:
+	$ fetch https://geoghegan.ca/pub/unbound-adblock/0.5/unbound-adblock.sh
+
+2) Install script with appropriate permissions and remove old install location:
+	# install -m 755 -o root -g bin unbound-adblock.sh /usr/local/bin/unbound-adblock
+	# rm /usr/local/bin/unbound-adblock.sh
+
+3) Update _adblock users home folder:
+   Previous unbound-adblock releases incorrectly set the users home folder
+	# pw usermod _adblock -d /var/empty
+
+4) Update adblock file locations:
+   unbound-adblock now uses the standard RPZ blocklist format
+	# install -m 644 -o _adblock -g wheel /dev/null /usr/local/etc/unbound/adblock.rpz
+	# rm /usr/local/etc/unbound/adblock.conf
+
+5) Update doas.conf permissions:
+	$ cat /usr/local/etc/doas.conf
+	...
+	permit root
+	permit nopass _adblock cmd /usr/local/sbin/unbound-control args -q status
+	permit nopass _adblock cmd /usr/local/sbin/unbound-control args -q flush_zone unbound-adblock
+	permit nopass _adblock cmd /usr/local/sbin/unbound-control args -q auth_zone_reload unbound-adblock
+	# Only needed if using old unbound specific 'local-data' backend with '-o unbound'
+	permit nopass _adblock cmd /usr/sbin/service args unbound restart
+	...
+
+6) Configure unbound-control if it isn't already:
+	# unbound-control-setup
+
+7) Update unbound.conf to remove reference to old 'adblock.conf' file and add newly required RPZ syntax:
+	# cat /usr/local/etc/unbound/unbound.conf
+	...
+	# Required modules for RPZ
+	module-config: "respip validator iterator"
+	rpz:
+	   name: "unbound-adblock"
+	   zonefile: "/usr/local/etc/unbound/adblock.rpz"
+	   rpz-log: yes
+	   rpz-log-name: "unbound-adblock"
+
+	remote-control:
+	    control-enable: yes
+	    control-interface: 127.0.0.1
+	...
+
+8) Create unbound-adblock log directory:
+	# install -d -o root -g wheel -m 755 /var/log/unbound-adblock
+	# install -o _adblock -g wheel -m 640 /dev/null /var/log/unbound-adblock/unbound-adblock.log
+	# install -o _adblock -g wheel -m 640 /dev/null /var/log/unbound-adblock/unbound-adblock.log.0.gz
+
+9) Update cron job (See note about cron in the 'Post Install Notes'):
+	# crontab -u _adblock -e
+	...
+	SHELL=/bin/sh
+	@daily	sleep $(echo $((RANDOM\%7200+1))) ; unbound-adblock -O dragonflybsd
+	...
+
+10) Install ksh (See 'Post Install Notes' below for more info):
+	# pkg install oksh
+	# ln -s /usr/local/bin/oksh /usr/local/bin/ksh
+
+Note: unbound-adblock now automagically detects if mawk, gawk (GNU awk), ripgrep or GNU grep is present.
+      This can improve performance on low powered devices significantly.
+
+Please read the man page for information on how to configure unbound-adblock.
+The manpage can be found here: https://www.geoghegan.ca/pub/unbound-adblock/0.5/man/man.txt
+
+To receive notification of new unbound-adblock releases and updates please send an email
+to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-adblock"
+
+
+###################################################################
+# Fresh Installation Guide 
+###################################################################
+
+1) Install and configure Unbound as a local recursive DNS server:
+   An example unbound.conf can be found here:
+	https://www.geoghegan.ca/pub/unbound-adblock/0.5/unbound.conf.example
+
+2) Download script:
+	$ fetch https://geoghegan.ca/pub/unbound-adblock/0.5/unbound-adblock.sh
+
+3) Create a new user (we'll call ours "_adblock"):
+   The user should be created with a default shell of "nologin", home folder
+   set to /var/empty/ with no password specified (disables password logins) 
+	# pw useradd _adblock -s /sbin/nologin -d /var/empty
+
+4) Install script with appropriate permissions:
+	# install -m 755 -o root -g bin unbound-adblock.sh /usr/local/bin/unbound-adblock
+
+5) Create required files:
+	# install -m 644 -o _adblock -g wheel /dev/null /usr/local/etc/unbound/adblock.rpz
+	# install -d -o root -g wheel -m 755 /var/log/unbound-adblock
+	# install -o _adblock -g wheel -m 640 /dev/null /var/log/unbound-adblock/unbound-adblock.log
+	# install -o _adblock -g wheel -m 640 /dev/null /var/log/unbound-adblock/unbound-adblock.log.0.gz
+
+6) Install 'doas' utility and Korn Shell (ksh):
+	# pkg install doas oksh
+	# ln -s /usr/local/bin/oksh /usr/local/bin/ksh
+
+6.b) OPTIONAL: Install mawk for improved performance:
+	# pkg install mawk
+
+7) Give user '_adblock' strict doas permission for the exact command the 
+   script needs run as superuser. NOTE: Unlike 'sudo', _ALL_ users must be
+   explicitly granted permission to use doas, even the root user.
+ 
+	$ cat /usr/local/etc/doas.conf
+	...
+	permit root
+	permit nopass _adblock cmd /usr/local/sbin/unbound-control args -q status
+	permit nopass _adblock cmd /usr/local/sbin/unbound-control args -q flush_zone unbound-adblock
+	permit nopass _adblock cmd /usr/local/sbin/unbound-control args -q auth_zone_reload unbound-adblock
+	# Only needed if using old unbound specific 'local-data' backend with '-o unbound'
+	permit nopass _adblock cmd /usr/sbin/service args unbound restart
+	...
+
+8) Configure unbound-control if it isn't already:
+	# unbound-control-setup
+
+9) Add a few lines to your unbound.conf located BEFORE the forwarders section:
+   (Also add 'unbound-control' bits to your config if it's not there already)
+	...
+	# Required modules for RPZ
+	module-config: "respip validator iterator"
+	rpz:
+	   name: "unbound-adblock"
+	   zonefile: "/usr/local/etc/unbound/adblock.rpz"
+	   rpz-log: yes
+	   rpz-log-name: "unbound-adblock"
+
+	remote-control:
+	    control-enable: yes
+	    control-interface: 127.0.0.1
+	...
+
+10) Run script manually using the '-O dragonflybsd' argument:
+	# doas -u _adblock unbound-adblock -O dragonflybsd
+	  unbound(ok)
+	
+11) For good measure, we'll run unbound-adblock once more:
+	# doas -u _adblock unbound-adblock -O dragonflybsd
+	
+12) Edit _adblock crontab to run unbound-adblock every night at midnight:
+	# crontab -u _adblock -e
+	...
+	SHELL=/bin/sh
+	@daily	sleep $(echo $((RANDOM\%7200+1))) ; unbound-adblock -O dragonflybsd
+	...
+
+
+Yay! unbound-adblock is now installed!
+
+With the nightly cron job, the list will be regularly updated with
+the latest known bad hosts.
+
+Please read the man page for information on how to configure unbound-adblock.
+The manpage can be found here: https://www.geoghegan.ca/pub/unbound-adblock/0.5/man/man.txt
+
+To receive notification of new unbound-adblock releases and updates please send an email
+to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-adblock"
+
+
+###################################################################
+# Post Install Notes:
+###################################################################
+
+X) To add custom rules or enable features, or add alternate blocklists, 
+   See the "User Configuration Area" located at the top of the script.
+   This area serves as a built in config file, so please feel free to 
+   edit it and experiment with all the features available within.
+   ---
+   Note: Most options can also be configured from the command line
+
+X) Regarding Shells:
+   unbound-adblock requires a shell that supports 'typeset' and ksh array syntanx.
+   DragonflyBSD's default /bin/sh doesn't behave the way we need it to,
+   so a modern shell should be installed. Five shells in DragonflyBSD's
+   package repository have been tested and confirmed to work: 
+	* oksh (OpenBSD's ksh)
+	* ksh93
+	* mksh
+	* zsh
+	* bash
+   ...
+   If you wish to use one of the above shells, you'll have to make a few changes.
+   To make these changes automatically (replace "zsh" with your preferred shell):
+	# sed -i -e "s/'ksh'/'zsh'/g" -e '1 s/ksh/zsh/' /usr/local/bin/unbound-adblock
+
+X) Regarding Cron Jobs:
+   Over the past year I've noticed a number of list host servers
+   going down at midnight in populated timezones (ie West Coast,
+   East Coast and Western Europe). To be respectful (and to avoid
+   overloading list providers servers) we have cron jobs 
+   scheduled to run at a random time within a defined interval.
+   ---
+   With the new default cron job, unbound-adblock will be run every 
+   night at some point between midnight and 2AM, and thus
+   distributing the load of thousands of queries from numerous
+   users over a 2 hour period rather than a matter of seconds.
+
+X) If you would like to update the unbound-adblock blocklists at a more frequent
+   interval you can use a modified cron job:
+   ---
+   It is essential that you make use of the crontab randomization feature to
+   ensure use of unbound-adblock remains respecful of blocklist provider resources.
+   ---
+   The following example runs unbound-adblock every 3 to 4 hours at a random minute
+   (this avoids flooding the server with traffic at exactly XX:00)
+   ---
+   Run unbound-adblock every 3 hours Example:
+	(you can change '/3' to '/4' to run every 4 hours)
+
+	# crontab -u _adblock -e
+	...
+	0 */3 * * *	sleep $(echo $((RANDOM\%3600+1))) ; unbound-adblock -O dragonflybsd
+	...
+
+X) OPTIONAL -- Add the following line to your pf.conf: 
+     NOTE: This rule intercepts DNS traffic bound for Google DNS servers.
+     Google mandates the use of their DNS servers in many apps and services.
+     Many devices also use hardcoded Google DNS that cannot be changed.
+     This is both a privacy and freedom concern. This should help rectify the issue:
+     (This rule should be run on your router/gateway)
+	# Replace '$adblock' with the IP address of the Unbound machine
+	...
+	table <gooDNS4> {8.8.8.8 8.8.4.4}
+	table <gooDNS6> {2001:4860:4860::8888 2001:4860:4860::8844}
+	pass in quick to <gooDNS4> rdr-to $adblock
+	pass in quick to <gooDNS6> rdr-to $adblock6
+	...
+
+ 	-- Reload your pf rule set:
+	# pfctl -f /etc/pf.conf
+
