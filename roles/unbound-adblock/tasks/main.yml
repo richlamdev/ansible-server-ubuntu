@@ -164,11 +164,35 @@
     job: "/usr/local/bin/unbound-adblock -O linux"
     state: present
 
-# Define the handler to reload Unbound
-# handlers:
-#   - name: reload unbound
-#     become: yes
-#     service:
-#       name: unbound
-#       state: reloaded
+- name: Ensure the logrotate directory exists
+  file:
+    path: /etc/logrotate.d
+    state: directory
+    mode: 0755
 
+- name: Create logrotate configuration for unbound-adblock
+  copy:
+    dest: /etc/logrotate.d/unbound-adblock
+    content: |
+      /var/log/unbound-adblock/unbound-adblock.log {
+          daily
+          rotate 5
+          compress
+          notifempty
+          missingok
+          create 0640 _adblock root
+      }
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Test logrotate configuration
+  command: logrotate --debug /etc/logrotate.conf
+  register: logrotate_test
+  changed_when: false
+  failed_when: logrotate_test.stderr != ''
+  ignore_errors: true
+
+- name: Print logrotate test output
+  debug:
+    var: logrotate_test.stdout
