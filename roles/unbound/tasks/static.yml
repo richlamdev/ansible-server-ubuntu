@@ -68,13 +68,3 @@
   notify:
     - Reload systemd
     - Start Unbound
-
-- name: Reload systemd
-  systemd:
-    daemon_reload: true
-
-- name: Start Unbound
-  systemd:
-    name: unbound
-    enabled: yes
-    state: started
