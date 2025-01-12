@@ -46,7 +46,34 @@
     mode: '0640'
   when: rootkey.rc in [0, 1]
 
-- name: Ensure Unbound service is enabled and running
+- name: Create Unbound systemd override directory
+  file:
+    path: /etc/systemd/system/unbound.service.d
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Configure Unbound systemd service override file
+  copy:
+    dest: /etc/systemd/system/unbound.service.d/override.conf
+    content: |
+      [Service]
+      Restart=on-failure
+      RestartSec=5s
+      TimeoutSec=10s
+    mode: '0644'
+    owner: root
+    group: root
+  notify:
+    - Reload systemd
+    - Start Unbound
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: Start Unbound
   systemd:
     name: unbound
     enabled: yes
