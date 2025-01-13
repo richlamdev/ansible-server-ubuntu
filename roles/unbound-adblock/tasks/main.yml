@@ -176,11 +176,14 @@
     content: |
       /var/log/unbound-adblock/unbound-adblock.log {
           daily
-          rotate 5
+          rotate 7
           compress
           notifempty
           missingok
           create 0640 _adblock root
+          postrotate
+              systemctl reload unbound > /dev/null 2>/dev/null || true
+          endscript
       }
     owner: root
     group: root
