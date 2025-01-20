@@ -1,0 +1,47 @@
+---
+- name: Find all files in /etc/ssh/sshd_config.d/
+  ansible.builtin.find:
+    paths: /etc/ssh/sshd_config.d/
+    file_type: file
+  register: sshd_config_d_files
+
+- name: Remove all files in /etc/ssh/sshd_config.d/
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ sshd_config_d_files.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: sshd_config_d_files.matched > 0
+
+- name: Copy custom sshd_config.conf to /etc/ssh/sshd_config.d/
+  ansible.builtin.copy:
+    src: "sshd_config.conf"
+    dest: /etc/ssh/sshd_config.d/
+    owner: root
+    group: root
+    mode: '0644'
+
+
+- name: Find all files in /etc/ssh/ssh_config.d/
+  ansible.builtin.find:
+    paths: /etc/ssh/ssh_config.d/
+    file_type: file
+  register: ssh_config_d_files
+
+- name: Remove all files in /etc/ssh/ssh_config.d/
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ ssh_config_d_files.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: ssh_config_d_files.matched > 0
+
+- name: Copy ssh_config to /etc/ssh/ssh_config.d/
+  ansible.builtin.copy:
+    src: "ssh_config.conf"
+    dest: /etc/ssh/ssh_config.d/
+    owner: root
+    group: root
+    mode: '0644'
