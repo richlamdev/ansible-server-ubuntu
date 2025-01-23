@@ -5,6 +5,12 @@
 This is a collection of roles and configuarions I use for Ubuntu Server
 deployment.
 
+This playbook was primarily created for deploying [Unbound DNS](https://www.nlnetlabs.nl/projects/unbound/about/) server with
+[Unbound-adblock](https://geoghegan.ca/unbound-adblock.html).
+
+Unbound-adblock is essentially a DNS filter that blocks ads and trackers,
+similar to [pi-hole](https://pi-hole.net/).
+
 This Playbook is designed and tested for Ubuntu Server 24.04.1 LTS.  This
 playbook may not work on older versions of Ubuntu without modification.
 
@@ -49,9 +55,10 @@ Alternatively, if password authentication is preferred, install sshpass.\
 
 ** *Limit use of sshpass for setup only, due to potential security issues. * **
 
-Note: Be aware the /role/base/tasks/authentication.yml will update the
-/etc/ssh/sshd_config, which will disable SSH password authentication;
-consequently, making SSH key authentication a hard requirement.
+Note: Be aware /role/base/tasks/ssh.yml will update the sshd_config indirectly
+by the configuration file placed in /etc/ssh/sshd_config.d/, this will disable
+SSH password authentication; consequently, making SSH key-based authentication
+a hard requirement.
 
 4. Amend inventory file if needed, default target is localhost.
 
@@ -89,14 +96,14 @@ Additional information for the following roles:
     (unattended-upgrades), however, none of those methods seem to work.
     This primitive implementation achieves a similar effect.
   * This role is for any desktop/laptop that requires operating 24/7.
-  * unfortunately there is no method to ensure reboots are triggered when
+  * Unfortunately there is no method to ensure reboots are triggered when
     required, at this time.
 
 * base
   * packages.yml - list of packages to install via apt
   * keychron.yml - enables keychron keyboard shortcuts
   * autostart.yml - enables autostart of applications
-  * authentication.yml - configures ssh server and client.
+  * ssh.yml - configures ssh server and client.
                          disables password authentication
 
 * disable-local-dns
@@ -116,9 +123,6 @@ Additional information for the following roles:
     (this is slightly different from the built in alt-c command provided with fzf)
   * refer to System Updates section for manual (script) updating of fzf
 
-* ufw
-  * disables incoming ports, except port 22 (limit inbound connections port 22)
-
 * unbound
   * installs and configures unbound DNS server
   * enables DNSSEC
@@ -130,7 +134,7 @@ Additional information for the following roles:
     I only transferred the implementation from Bash to Ansible.
   * Refer to Unbound Adblock [webpage](https://www.geoghegan.ca/unbound-adblock.html)
 
-* vim
+* vim (this role is commented out by default)
   * installs customization only, does not install vim
     * compile and install vim with this [script](https://github.com/richlamdev/vim-compile)
     * Note: Vim >9.0 is required for codeium plugin below, at the time of the
@@ -172,21 +176,9 @@ The commands used to keep your system up to date are:
 1. `sudo apt update && sudo apt upgrade -y`
 2. `sudo apt autoremove -y` (not really an update, but removes old packages)
 3. `sudo snap refresh`*
-4. `pipx upgrade-all`
 
 *while snap package mangement is controversial - tradeoff of manual updates
-and convenience...
-
-Upgrade specific packages, not upraded via apt or snap:
-
-1. `execute scripts/aws_upgrade.sh`
-2. `execute scripts/sam_upgrade.sh`
-3. `execute scripts/fzf_upgrade.sh`
-   (alternatively delete the ~/.fzf folder and re-run ansible)
-4. If Docker Desktop, is installed.  Start Docker Desktop, click "Settings",
-   then "Software updates", then "Check for updates", then Download and install
-   updated Docker Desktop.
-   `sudo apt update && sudo apt install ./docker-desktop-<version>-<arch>.deb`
+vs. convenience...
 
 
 ## Idempotency
@@ -194,31 +186,14 @@ Upgrade specific packages, not upraded via apt or snap:
 The majority of this playbook is idempotent.  Minimal use of Ansible shell or
 command is used.
 
-AWS CLI, AWS SAM CLI, and fzf are not idempotent.
-While fzf could be installed and maintained via apt, I prefer to update fzf
-more frequently and therefore perform the upgrades manually (by script).
-Refer to above System Updates section for updates beyond package management.
-
 
 ## Scripts
 
 1. gen_ssh_keys.sh - generates a new SSH key pair for localhost and copies
 the public key to ~/.ssh/authorized_keys.
 
-2. desktop-setup.sh - restore dconf settings.  (instructions within this file
-to save dconf settings)
-
-3. check_ssh_auth.sh - checks for SSH authentication methods against a host
+2. check_ssh_auth.sh - checks for SSH authentication methods against a host
 Eg: `./check_ssh_auth.sh localhost`
-
-4. multipass-test.sh
-  - basic script to test ansible roles with multipass Ubuntu virtual machines
-  - open the file for documentation and usage
-  - multipass credentials saved in the file; naturally not a concern given it's
-    an ephemeral VM
-  - to launch a multipass vm: `cd scripts` `./multipass-test.sh`
-  - to launch a multipass vm with desktop setup:
-    `cd scripts` `./multipass-test.sh desktop`
 
 
 ## Random Notes, General Information & Considerations
