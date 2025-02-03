@@ -128,6 +128,7 @@ Additional information for the following roles:
   * enables DNSSEC
   * enables DNS-over-TLS via Quad9, CloudFlare, Mulvadd, Adguard DNS service
     providers
+  * allows incoming TCP and UDP connections on port 53
 
 * unbound-adblock
   * all credit for this role goes to [Jordan Geoghegan](https://www.geoghegan.ca/about.html).  I did not write this,
