@@ -96,8 +96,9 @@ Additional information for the following roles:
     (unattended-upgrades), however, none of those methods seem to work.
     This primitive implementation achieves a similar effect.
   * This role is for any desktop/laptop that requires operating 24/7.
-  * Unfortunately there is no method to ensure reboots are triggered when
-    required, at this time.
+  * There is a basic script (check_reboot.sh) to check if a reboot is required,
+    which is scheduled to run daily at 0400hrs.(checks for presence of
+    /var/run/reboot-required)
 
 * base
   * packages.yml - list of packages to install via apt
