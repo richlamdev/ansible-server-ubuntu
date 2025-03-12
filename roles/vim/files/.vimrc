@@ -7,8 +7,7 @@
 " options, so any other options should be set AFTER setting 'compatible'.
 set nocompatible
 set title                             " set title of window
-"set titlestring=VIM:\ %-25.55F\ %a%r%m titlelen=70
-set titlestring=\ \ [PWD:\ %{getcwd()}]\ \ %F\ %a%r%m titlelen=80
+set titlestring=\ [CWD:\ %{getcwd()}]\ \ \ \ [%t]%a%r%m%h%w%q titlelen=80
 set ttyfast                           " Make the keyboard fast
 "set timeout timeoutlen=1000 ttimeoutlen=50
 set showmode                          " always show what mode we're currently editing in
@@ -160,6 +159,7 @@ let g:ale_fixers = {'json': ['jq'], 'python': ['black'], 'sh': ['shfmt'], 'yaml'
 let g:ale_python_flake8_options = '--max-line-length 79'
 let g:ale_python_black_options = '--line-length 79'
 let g:ale_sh_shfmt_options = '-i 2 -ci'
+let g:ale_sh_shellcheck_options = '--exclude=SC2034' " ignore unused shell variables
 
 let g:ale_fix_on_save = 1
 let g:ale_lint_on_text_changed = 'never'
@@ -169,6 +169,7 @@ let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 let g:ale_sign_error = '✘'
 let g:ale_sign_warning = '⚠'
 let g:ale_lint_on_text_changed = 'never'
+
 
 " don't worry about long line length for yaml
 let g:ale_yaml_yamllint_options = '-d "{extends: relaxed, rules: {line-length: {max: disable}}"'
@@ -218,7 +219,7 @@ function! SetStatusLine()
   "set statusline+=%2*                " set to User2 color
   "set statusline+=%{getcwd()}/       " current working directory (same as :pwd)
   set statusline+=%4*                " set to User4 color
-  "set statusline+=%f                 " current directory + file with respect to pwd
+  set statusline+=%f                 " current directory + file with respect to pwd
   set statusline+=\                  " add space separator
   set statusline+=%3*                " set to User3 color
   set statusline+=\ft:\%y            " file type in [brackets]
