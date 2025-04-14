@@ -124,6 +124,16 @@ Additional information for the following roles:
     (this is slightly different from the built in alt-c command provided with fzf)
   * refer to System Updates section for manual (script) updating of fzf
 
+* ntp-via-dhcp
+  * configures NTP to use DHCP to obtain NTP server IP address for each interface found
+    * attempts to obtain all physical local ethernet and wireless interfaces
+    * attempts to disregard any loopback interfaces and virtual interfaces
+    * assumes that DHCP is sending NTP server IP address to the subnet the interface is assigned to
+  * confirm NTP server with any of the following commands:
+    * `timedatectl timesync-status`
+    * `timedatectl show-timesync --all`
+    * `journalctl -u systemd-timesyncd -n 20 | grep -A5 "Network Time Synchronization"`
+
 * unbound
   * installs and configures unbound DNS server
   * enables DNSSEC
