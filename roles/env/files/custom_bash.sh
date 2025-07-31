@@ -15,6 +15,7 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias myip='dig +short myip.opendns.com @resolver1.opendns.com'
 alias update='sudo apt update && sudo apt dist-upgrade -y && sudo snap refresh && sudo apt autoremove -y && sudo apt clean'
+alias g='git'
 
 # google search from the command line
 google() {
