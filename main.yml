@@ -11,7 +11,6 @@
   roles:
     - auto-update
     - base
-    - ntp-via-dhcp
     - unbound
     - unbound-adblock
       #- role: vim
