@@ -117,5 +117,6 @@ if ! shopt -oq posix; then
 fi
 
 # customize prompt
-source "/home/$USER/.bashrc.d/custom_bash.sh"
-source "/home/$USER/.bashrc.d/git_bash_ps1.sh"
+for file in /home/$USER/.bashrc.d/*.sh; do
+  [ -r "$file" ] && source "$file"
+done
