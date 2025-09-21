@@ -144,9 +144,9 @@ Additional information for the following roles:
   * enables DNSSEC
   * enables DNS-over-TLS via Quad9, CloudFlare, Mulvadd, Adguard DNS service
     providers; refer to /etc/unbound/unbound.conf.d/20-forward-zones.conf
-  * add custom local dns records by editing
-    /etc/unbound/unbound.conf.d/10-local-dns.conf.example as needed;
-    make sure you save the file without the .example extension when done
+  * add custom local dns records by editing\
+    /etc/unbound/unbound.conf.d/10-local-dns.conf.example as needed;\
+    the save the file without the .example extension when done
   * allows incoming TCP and UDP connections on port 53 via ufw
 
 * unbound-adblock
