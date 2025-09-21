@@ -68,3 +68,15 @@
   notify:
     - Reload systemd
     - Start Unbound
+
+- name: Deploy static Unbound files
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/unbound/unbound.conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - 10-local-dns.conf.example
+    - 20-forward-zones.conf
+  notify: reload unbound
