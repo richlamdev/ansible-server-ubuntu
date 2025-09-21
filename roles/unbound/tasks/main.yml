@@ -1,9 +1,12 @@
 ---
-- name: static file configuration
-  import_tasks: static.yml
+- name: setup configuration
+  import_tasks: setup.yml
 
 - name: dynamic file configuration
   import_tasks: dynamic.yml
+
+- name: static file configuration
+  import_tasks: static.yml
 
 - name: ufw configuration
   import_tasks: ufw.yml

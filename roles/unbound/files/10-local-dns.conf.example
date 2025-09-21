@@ -1,0 +1,16 @@
+# This is an example local DNS configuration for Unbound.
+# Copy this file to 10-local-dns.conf and customize with your private records.
+# Make sure 10-local-dns.conf is gitignored to avoid exposing private data.
+
+# Example local static zone
+# local-zone: "lan." static
+
+# Example A records
+# local-data: "router.lan. IN A 192.168.1.1"
+# local-data: "nas.lan. IN A 192.168.1.10"
+
+# Example PTR records (reverse lookup)
+# local-data-ptr: "192.168.1.1 router.lan."
+# local-data-ptr: "192.168.1.10 nas.lan."
+
+# Add additional local zones and records below

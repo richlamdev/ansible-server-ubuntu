@@ -143,8 +143,11 @@ Additional information for the following roles:
   * installs and configures unbound DNS server
   * enables DNSSEC
   * enables DNS-over-TLS via Quad9, CloudFlare, Mulvadd, Adguard DNS service
-    providers
-  * allows incoming TCP and UDP connections on port 53
+    providers; refer to /etc/unbound/unbound.conf.d/20-forward-zones.conf
+  * add custom local dns records by editing\
+    /etc/unbound/unbound.conf.d/10-local-dns.conf.example as needed;\
+    the save the file without the .example extension when done
+  * allows incoming TCP and UDP connections on port 53 via ufw
 
 * unbound-adblock
   * all credit for this role goes to [Jordan Geoghegan](https://www.geoghegan.ca/about.html).  I did not write this,

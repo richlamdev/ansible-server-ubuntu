@@ -1,0 +1,21 @@
+---
+- name: Find all files from /etc/unbound/unbound.conf.d
+  find:
+    paths: /etc/unbound/unbound.conf.d
+    file_type: file
+  register: unbound_conf_files
+
+- name: Check if 00-server.conf already exists (determine fresh install vs rerun)
+  stat:
+    path: /etc/unbound/unbound.conf.d/00-server.conf
+  register: unbound_conf_stat
+
+- name: Delete existing files for clean first deployment
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ unbound_conf_files.files }}"
+  when: >
+    unbound_conf_files.matched > 0 and
+    unbound_conf_stat.stat.exists == False and
+    item.path != '/etc/unbound/unbound.conf.d/00-server.conf'
