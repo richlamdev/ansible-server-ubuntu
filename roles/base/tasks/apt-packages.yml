@@ -12,7 +12,6 @@
   loop:
     - clamav
     - clamav-daemon
-    - curl          # to be removed
     - dnsutils
     - fd-find
     - tmux
