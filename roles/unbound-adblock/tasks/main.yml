@@ -111,24 +111,32 @@
   loop_control:
     label: "Setting permissions on {{ item }}"
 
-- name: Add RPZ and remote-control configuration to 00-server.conf
-  become: yes
-  blockinfile:
-    path: /etc/unbound/unbound.conf.d/00-server.conf
-    block: |
-      # Required modules for RPZ
-      module-config: "respip validator iterator"
-      rpz:
-         name: "unbound-adblock"
-         zonefile: "/etc/unbound/adblock.rpz"
-         rpz-log: yes
-         rpz-log-name: "unbound-adblock"
+# - name: Add RPZ and remote-control configuration to 00-server.conf
+#   become: yes
+#   blockinfile:
+#     path: /etc/unbound/unbound.conf.d/00-server.conf
+#     block: |
+#       # Required modules for RPZ
+#       module-config: "respip validator iterator"
+#       rpz:
+#          name: "unbound-adblock"
+#          zonefile: "/etc/unbound/adblock.rpz"
+#          rpz-log: yes
+#          rpz-log-name: "unbound-adblock"
 
-      remote-control:
-          control-enable: yes
-          control-interface: 127.0.0.1
-    insertbefore: "forward-zone"  # Insert before the 'forward-zone' section
-    create: yes
+#       remote-control:
+#           control-enable: yes
+#           control-interface: 127.0.0.1
+#     insertbefore: "forward-zone"  # Insert before the 'forward-zone' section
+#     create: yes
+
+- name: Deploy RPZ configuration drop-in
+  copy:
+    src: 30-rpz.conf
+    dest: /etc/unbound/unbound.conf.d/server.d/30-rpz.conf
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Ensure Unbound is reloaded after configuration changes
   become: yes
