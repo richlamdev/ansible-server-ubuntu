@@ -10,3 +10,10 @@
 
 - name: ufw configuration
   import_tasks: ufw.yml
+
+# Final guarantee that Unbound is enabled and running
+- name: Ensure Unbound is enabled and running
+  service:
+    name: unbound
+    state: started
+    enabled: yes
