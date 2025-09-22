@@ -66,8 +66,8 @@
     owner: root
     group: root
   notify:
-    - Reload systemd
-    - Start Unbound
+    - reload systemd
+    - restart unbound
 
 - name: Deploy static Unbound files
   copy:
