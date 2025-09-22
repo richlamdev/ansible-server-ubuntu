@@ -13,9 +13,9 @@
     file_type: file
   register: unbound_conf_files
 
-- name: Check if 00-server.conf already exists (determine fresh install vs rerun)
+- name: Check if 00-top-level-server.conf already exists (determine fresh install vs rerun)
   stat:
-    path: /etc/unbound/unbound.conf.d/00-server.conf
+    path: /etc/unbound/unbound.conf.d/00-top-level-server.conf
   register: unbound_conf_stat
 
 - name: Delete existing files for clean first deployment
@@ -26,6 +26,6 @@
   when: >
     unbound_conf_files.matched > 0 and
     unbound_conf_stat.stat.exists == False and
-    item.path not in ['/etc/unbound/unbound.conf.d/00-server.conf',
-                      '/etc/unbound/unbound.conf.d/server.d/10-local-dns.conf.example',
-                      '/etc/unbound/unbound.conf.d/20-forward-zones.conf']
+    item.path not in ['/etc/unbound/unbound.conf.d/00-top-level-server.conf',
+                      '/etc/unbound/unbound.conf.d/server.d/10-server-local-dns.conf.example',
+                      '/etc/unbound/unbound.conf.d/20-top-level-forward-zones.conf']
