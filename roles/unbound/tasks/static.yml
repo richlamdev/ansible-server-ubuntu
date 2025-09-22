@@ -72,7 +72,7 @@
 - name: Deploy static Unbound files
   copy:
     src: "{{ item }}"
-    dest: "/etc/unbound/unbound.conf.d/{{ item }}"
+    dest: "/etc/unbound/unbound.conf.d/server.d/{{ item }}"
     owner: root
     group: root
     mode: "0644"
