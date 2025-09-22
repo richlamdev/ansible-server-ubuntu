@@ -1,18 +1,18 @@
----
-# - name: reload unbound
-#   service:
-#     name: unbound
-#     state: restarted
+- name: Reload unbound
+  service:
+    name: unbound
+    state: reloaded
 
-# - name: reload UFW
-#   command: ufw reload
+- name: Restart unbound
+  service:
+    name: unbound
+    state: restarted
+
+- name: Start unbound
+  service:
+    name: unbound
+    state: started
+    enabled: yes
 
 - name: Reload systemd
-  systemd:
-    daemon_reload: true
-
-- name: Start Unbound
-  systemd:
-    name: unbound
-    enabled: yes
-    state: started
+  command: systemctl daemon-reload

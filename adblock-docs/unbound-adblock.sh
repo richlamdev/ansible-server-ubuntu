@@ -20,7 +20,7 @@
 
 # Fighting for freedom and fighting terror - but what's reality?
 
-# Fetch, parse and generate domain blocklists data into format suitable 
+# Fetch, parse and generate domain blocklists data into format suitable
 # for ingestion by RPZ compatible DNS servers and/or unbound/unwind.
 
 version='0.5p4'
@@ -772,7 +772,7 @@ main() {
 	readonly _CHECK_ONLY _NO_UID_CHECK _PRINT_ONLY _VERBOSE
 
 	# Mark user-defined variables as read-only
-	readonly _AGENT _LOG _STRICT _HOSTS_FMT_BLOCKLISTS _DOMAIN_FMT_BLOCKLISTS _WHITELIST 
+	readonly _AGENT _LOG _STRICT _HOSTS_FMT_BLOCKLISTS _DOMAIN_FMT_BLOCKLISTS _WHITELIST
 
 	# Set variables based on specified operating system
 	# We use 'test -n' here to check for config overrides provided via commandline argument
@@ -939,7 +939,7 @@ main() {
 	if [ "${_PRINT_ONLY}" -eq 1 ]; then
 		if [ "${_ALT_RPZ}" -eq 1 ]; then
 			# Print cross-platform RPZ blocklist data to stdout
-			if test -s "${user_rules}" ; then 
+			if test -s "${user_rules}" ; then
 				cat -- < "${user_rules}"
 			fi
 			sed 's/$/ CNAME ./g' < "${rawout}"
@@ -974,6 +974,3 @@ command -v typeset >/dev/null 2>&1 || ERR 'Are you running a modern shell? Curre
 
 # Execute main function
 main "$@"
-
-
-

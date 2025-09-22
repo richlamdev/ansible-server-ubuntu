@@ -1,5 +1,5 @@
 ###################################################################
-# unbound-adblock 0.5 Alpine Linux Installation Instructions 
+# unbound-adblock 0.5 Alpine Linux Installation Instructions
 # Copyright 2018-2021 Jordan Geoghegan <jordan@geoghegan.ca>
 ###################################################################
 
@@ -24,7 +24,7 @@
    These instructions are known to work on Alpine 3.9.x
 
 2) If something doesn't work, then the script can be easily tweaked
-   to make it work. The variables set based on OS declaration can be 
+   to make it work. The variables set based on OS declaration can be
    very easily modified to accomodate nearly any OS/setup
 
 3) This guide assumes you know how to setup Unbound. If not,
@@ -50,14 +50,14 @@ Alpine Linux Unbound Quick Start:
 
 
 ###################################################################
-# Upgrade from unbound-adblock 0.4 
+# Upgrade from unbound-adblock 0.4
 ###################################################################
 
 A fresh install of unbound-adblock is recommended.
 
 
 ###################################################################
-# Fresh Installation Guide 
+# Fresh Installation Guide
 ###################################################################
 
 1) Install and configure Unbound as a local recursive DNS server
@@ -69,7 +69,7 @@ A fresh install of unbound-adblock is recommended.
 
 3) Create a new user (we'll call ours "_adblock"):
    The user should be created with a default shell of "nologin", home folder
-   set to /var/empty/ with no password specified (disables password logins) 
+   set to /var/empty/ with no password specified (disables password logins)
 	# adduser -D -s /sbin/nologin _adblock
 
 4) Install script with appropriate permissions:
@@ -86,17 +86,17 @@ A fresh install of unbound-adblock is recommended.
 	 The below commands selectively permit the edge repository for the specified packages:
 	 ---
 	 # apk add coreutils gzip
-	 # apk add doas --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main/ --allow-untrusted 
+	 # apk add doas --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main/ --allow-untrusted
 	 # apk add oksh --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
 	 # ln -s /bin/oksh /bin/ksh
 
 6.b) OPTIONAL: Install GNU awk for improved performance:
 	# apk add gawk
 
-7) Give user '_adblock' strict doas permission for the exact command the 
+7) Give user '_adblock' strict doas permission for the exact command the
    script needs run as superuser. NOTE: Unlike 'sudo', _ALL_ users must be
    explicitly granted permission to use doas, even the root user.
- 
+
 	$ cat /etc/doas.conf
 	...
 	permit root
@@ -121,7 +121,7 @@ A fresh install of unbound-adblock is recommended.
 9) Run script manually using the '-O alpine' argument:
 	# doas -u _adblock unbound-adblock -O alpine
 	  unbound(ok)
-	
+
 10) Edit _adblock crontab to run unbound-adblock every night at midnight:
 	# crontab -u _adblock -e
 	@daily	sleep $(echo $((RANDOM\%7200+1))) unbound-adblock -O alpine
@@ -143,9 +143,9 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 # Post Install Notes:
 ###################################################################
 
-X) To add custom rules or enable features, or add alternate blocklists, 
+X) To add custom rules or enable features, or add alternate blocklists,
    See the "User Configuration Area" located at the top of the script.
-   This area serves as a built in config file, so please feel free to 
+   This area serves as a built in config file, so please feel free to
    edit it and experiment with all the features available within.
    ---
    Note: Most options can also be configured from the command line
@@ -154,11 +154,11 @@ X) Regarding Cron Jobs:
    Over the past year I've noticed a number of list host servers
    going down at midnight in populated timezones (ie West Coast,
    East Coast and Western Europe). To be respectful (and to avoid
-   overloading list providers servers) we have cron jobs 
+   overloading list providers servers) we have cron jobs
    scheduled to run at a random time within a defined interval.
    ---
-   With the new default cron job, unbound-adblock will be run every 
-   night at some point between midnight and 2AM, and thus 
+   With the new default cron job, unbound-adblock will be run every
+   night at some point between midnight and 2AM, and thus
    distributing the load of thousands of queries from numerous
    users over a 2 hour period rather than a matter of seconds.
 
@@ -178,7 +178,7 @@ X) If you would like to update the unbound-adblock blocklists at a more frequent
 	...
 	0 */3 * * *	sleep $(echo $((RANDOM\%3600+1))) ; unbound-adblock -O alpine
 	...
- 
+
 X) Google mandates the use of their DNS servers in many apps and services
    and many devices also use hardcoded Google DNS that cannot be changed.
    This is both a privacy and freedom concern. If you can, redirect all
@@ -190,4 +190,3 @@ X) Google mandates the use of their DNS servers in many apps and services
 	pass in quick to <gooDNS4> rdr-to $adblock
 	pass in quick to <gooDNS6> rdr-to $adblock6
 	...
-
