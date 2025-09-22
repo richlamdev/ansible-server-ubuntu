@@ -127,8 +127,10 @@ server:
 
 ## Unbound Optimization and Speed Tweaks ###
 
-        remote-control:
-        control-enable: yes
-        control-interface: 127.0.0.1
+        module-config: "respip validator iterator"
 
         include: "/etc/unbound/unbound.conf.d/server.d/*.conf"
+
+remote-control:
+        control-enable: yes
+        control-interface: 127.0.0.1
