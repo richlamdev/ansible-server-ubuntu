@@ -1,18 +1,26 @@
-- name: Reload unbound
+- name: reload unbound
   service:
     name: unbound
     state: reloaded
+  become: true
 
-- name: Restart unbound
+- name: restart unbound
   service:
     name: unbound
     state: restarted
+  become: true
 
-- name: Start unbound
+- name: start unbound
   service:
     name: unbound
     state: started
     enabled: yes
+  become: true
 
-- name: Reload systemd
+- name: reload systemd
   command: systemctl daemon-reload
+  become: true
+
+- name: reload ufw
+  command: ufw reload
+  become: true
