@@ -1,5 +1,5 @@
 ###################################################################
-# unbound-adblock 0.5 OpenBSD Installation Instructions 
+# unbound-adblock 0.5 OpenBSD Installation Instructions
 # Copyright 2018-2021 Jordan Geoghegan <jordan@geoghegan.ca>
 ###################################################################
 
@@ -46,7 +46,7 @@ OpenBSD Unbound Quick Start:
 	# rcctl start unbound
 
 ###################################################################
-# Upgrade from unbound-adblock 0.4 
+# Upgrade from unbound-adblock 0.4
 ###################################################################
 
 1) Download updated script:
@@ -96,7 +96,7 @@ OpenBSD Unbound Quick Start:
 	    control-enable: yes
 	    control-interface: 127.0.0.1
 	...
-  
+
    Note: unbound will need to be restarted for the changes to take effect.
 
 8) Create unbound-adblock log directory:
@@ -122,7 +122,7 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 
 
 ###################################################################
-# Fresh Installation Guide 
+# Fresh Installation Guide
 ###################################################################
 
 1) Configure Unbound as a local recursive DNS server
@@ -151,10 +151,10 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 	# install -o _adblock -g wheel -m 640 /dev/null /var/log/unbound-adblock/unbound-adblock.log
 	# install -o _adblock -g wheel -m 640 /dev/null /var/log/unbound-adblock/unbound-adblock.log.0.gz
 
-6) Give user '_adblock' strict doas permission for the exact commands the 
+6) Give user '_adblock' strict doas permission for the exact commands the
    script needs run as superuser. NOTE: Unlike 'sudo', _ALL_ users must be
    explicitly granted permission to use doas, even the root user.
- 
+
 	$ cat /etc/doas.conf
 	...
 	permit root
@@ -189,7 +189,7 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 
 10) Run script manually to parse and load the ruleset:
 	# doas -u _adblock unbound-adblock -O openbsd
-	
+
 11) Edit _adblock users crontab to run unbound-adblock every night:
 	# crontab -u _adblock -e
 	...
@@ -220,9 +220,9 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 # Post Install Notes:
 ###################################################################
 
-X) To add custom rules or enable features, or add alternate blocklists, 
+X) To add custom rules or enable features, or add alternate blocklists,
    See the "User Configuration Area" located at the top of the script.
-   This area serves as a built in config file, so please feel free to 
+   This area serves as a built in config file, so please feel free to
    edit it and experiment with all the features available within.
    ---
    Note: Most options can also be configured from the command line
@@ -232,11 +232,11 @@ X) Regarding Cron Jobs:
    Over the past year I've noticed a number of list host servers
    going down at midnight in populated timezones (ie West Coast,
    East Coast and Western Europe). To be respectful (and to avoid
-   overloading list providers servers) we have cron jobs 
+   overloading list providers servers) we have cron jobs
    scheduled to run at a random time within a defined interval.
    ---
-   With the new default cron job, unbound-adblock will be run every 
-   night at some point between midnight and 2AM, and thus 
+   With the new default cron job, unbound-adblock will be run every
+   night at some point between midnight and 2AM, and thus
    distributing the load of thousands of queries from numerous
    users over a 2 hour period rather than a matter of seconds.
 
@@ -251,12 +251,12 @@ X) If you would like to update unbound-adblock blocklists at a more frequent
    It is essential that you make use of the crontab randomization feature to
    ensure use of unbound-adblock remains respecful of blocklist provider resources.
    ---
-   The following example runs unbound-adblock every 3 hours at a random minute 
+   The following example runs unbound-adblock every 3 hours at a random minute
    (this avoids flooding the server with traffic at exactly XX:00)
    ---
    Run unbound-adblock every 3 hours Example: (you can change '/3' to '/4' to run every 4 hours)
-	Note: Use of the '-s' switch prevents 2 instances of unbound-adblock from being run 
-	at the same time - which is a good thing. 
+	Note: Use of the '-s' switch prevents 2 instances of unbound-adblock from being run
+	at the same time - which is a good thing.
 
 	# crontab -u _adblock -e
 	...
@@ -264,7 +264,7 @@ X) If you would like to update unbound-adblock blocklists at a more frequent
 	...
 
 
-X) OPTIONAL -- Add the following line to your pf.conf: 
+X) OPTIONAL -- Add the following line to your pf.conf:
      NOTE: This rule intercepts DNS traffic bound for Google DNS servers.
      Google mandates the use of their DNS servers in many apps and services.
      Many devices also use hardcoded Google DNS that cannot be changed.
@@ -280,5 +280,3 @@ X) OPTIONAL -- Add the following line to your pf.conf:
 
  	-- Reload your pf rule set:
 	# pfctl -f /etc/pf.conf
-
-

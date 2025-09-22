@@ -1,5 +1,5 @@
 ###################################################################
-# unbound-adblock 0.5 FreeBSD Installation Instructions 
+# unbound-adblock 0.5 FreeBSD Installation Instructions
 # Copyright 2018-2021 Jordan Geoghegan <jordan@geoghegan.ca>
 ###################################################################
 
@@ -24,8 +24,8 @@ Note: unbound-adblock uses unbound from the the FreeBSD package
       repository - not local-unbound from the FreeBSD base system.
       ---
       If you are interested in having this work with local-unbound
-      then send me an email telling me so, so I can gauge whether 
-      or not it's something that folks would actually use and enjoy. 
+      then send me an email telling me so, so I can gauge whether
+      or not it's something that folks would actually use and enjoy.
 
 1) This guide assumes that you know how to setup Unbound. If not,
    there are plenty of online guides to setting up Unbound.
@@ -51,7 +51,7 @@ FreeBSD Unbound Quick Start:
 
 
 ###################################################################
-# Upgrade from unbound-adblock 0.4 
+# Upgrade from unbound-adblock 0.4
 ###################################################################
 
 1) Download updated script:
@@ -130,7 +130,7 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 
 
 ###################################################################
-# Fresh Installation Guide 
+# Fresh Installation Guide
 ###################################################################
 
 1) Install and configure Unbound as a local recursive DNS server
@@ -142,7 +142,7 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 
 3) Create a new user (we'll call ours "_adblock"):
    The user should be created with a default shell of "nologin", home folder
-   set to /var/empty/ with no password specified (disables password logins) 
+   set to /var/empty/ with no password specified (disables password logins)
 	# pw useradd _adblock -s /sbin/nologin -d /var/empty
 
 4) Install script with appropriate permissions:
@@ -158,10 +158,10 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 	# pkg install doas oksh
 	# ln -s /usr/local/bin/oksh /usr/local/bin/ksh
 
-7) Give user '_adblock' strict doas permission for the exact command the 
+7) Give user '_adblock' strict doas permission for the exact command the
    script needs run as superuser. NOTE: Unlike 'sudo', _ALL_ users must be
    explicitly granted permission to use doas, even the root user.
- 
+
 	$ cat /usr/local/etc/doas.conf
 	...
 	permit root
@@ -197,7 +197,7 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 
 11) Run script manually to parse and load the adblock ruleset:
 	# doas -u _adblock unbound-adblock -O freebsd
-	
+
 12) Edit _adblock crontab to run unbound-adblock every night at midnight:
 	# crontab -u _adblock -e
 	...
@@ -221,9 +221,9 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 # Post Install Notes:
 ###################################################################
 
-X) To add custom rules or enable features, or add alternate blocklists, 
+X) To add custom rules or enable features, or add alternate blocklists,
    See the "User Configuration Area" located at the top of the script.
-   This area serves as a built in config file, so please feel free to 
+   This area serves as a built in config file, so please feel free to
    edit it and experiment with all the features available within.
    ---
    Note: Most options can also be configured from the command line
@@ -247,11 +247,11 @@ X) Regarding Cron Jobs:
    Over the past year I've noticed a number of list host servers
    going down at midnight in populated timezones (ie West Coast,
    East Coast and Western Europe). To be respectful (and to avoid
-   overloading list providers servers) we have cron jobs 
+   overloading list providers servers) we have cron jobs
    scheduled to run at a random time within a defined interval.
    ---
-   With the new default cron job, unbound-adblock will be run every 
-   night at some point between midnight and 2AM, and thus 
+   With the new default cron job, unbound-adblock will be run every
+   night at some point between midnight and 2AM, and thus
    distributing the load of thousands of queries from numerous
    users over a 2 hour period rather than a matter of seconds.
 
@@ -272,7 +272,7 @@ X) If you would like to update the unbound-adblock blocklists at a more frequent
 	0 */3 * * *	sleep $(echo $((RANDOM\%3600+1))) ; unbound-adblock -O freebsd
 	...
 
-X) OPTIONAL -- Add the following line to your pf.conf: 
+X) OPTIONAL -- Add the following line to your pf.conf:
      NOTE: This rule intercepts DNS traffic bound for Google DNS servers.
      Google mandates the use of their DNS servers in many apps and services.
      Many devices also use hardcoded Google DNS that cannot be changed.
@@ -288,4 +288,3 @@ X) OPTIONAL -- Add the following line to your pf.conf:
 
  	-- Reload your pf rule set:
 	# pfctl -f /etc/pf.conf
-

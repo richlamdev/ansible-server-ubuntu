@@ -1,5 +1,5 @@
 ###################################################################
-# unbound-adblock 0.5 NetBSD Installation Instructions 
+# unbound-adblock 0.5 NetBSD Installation Instructions
 # Copyright 2018-2021 Jordan Geoghegan <jordan@geoghegan.ca>
 ###################################################################
 
@@ -48,7 +48,7 @@ NetBSD Unbound Quick Start:
 
 
 ###################################################################
-# Upgrade from unbound-adblock 0.4 
+# Upgrade from unbound-adblock 0.4
 ###################################################################
 
 1) Download updated script:
@@ -127,7 +127,7 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 
 
 ###################################################################
-# Fresh Installation Guide 
+# Fresh Installation Guide
 ###################################################################
 
 1) Install and configure Unbound as a local recursive DNS server
@@ -155,10 +155,10 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 6) Install 'doas' utility, gsort and curl (plus requisite root certs):
 	# pkgin install doas coreutils curl ca-certificates
 
-7) Give user '_adblock' strict doas permission for the exact command the 
+7) Give user '_adblock' strict doas permission for the exact command the
    script needs run as superuser. NOTE: Unlike 'sudo', _ALL_ users must be
    explicitly granted permission to use doas, even the root user.
- 
+
 	$ cat /usr/pkg/etc/doas.conf
 	...
 	permit root
@@ -226,9 +226,9 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 # Post Install Notes:
 ###################################################################
 
-X) To add custom rules or enable features, or add alternate blocklists, 
+X) To add custom rules or enable features, or add alternate blocklists,
    See the "User Configuration Area" located at the top of the script.
-   This area serves as a built in config file, so please feel free to 
+   This area serves as a built in config file, so please feel free to
    edit it and experiment with all the features available within.
    ---
    Note: Most options can also be configured from the command line
@@ -237,11 +237,11 @@ X) Regarding Cron Jobs:
    Over the past year I've noticed a number of list host servers
    going down at midnight in populated timezones (ie West Coast,
    East Coast and Western Europe). To be respectful (and to avoid
-   overloading list providers servers) we have cron jobs 
+   overloading list providers servers) we have cron jobs
    scheduled to run at a random time within a defined interval.
    ---
-   With the new default cron job, unbound-adblock will be run every 
-   night at some point between midnight and 2AM, and thus 
+   With the new default cron job, unbound-adblock will be run every
+   night at some point between midnight and 2AM, and thus
    distributing the load of thousands of queries from numerous
    users over a 2 hour period rather than a matter of seconds.
 
@@ -251,7 +251,7 @@ X) If you would like to update the unbound-adblock blocklists at a more frequent
    It is essential that you make use of the crontab randomization feature to
    ensure use of unbound-adblock remains respecful of blocklist provider resources.
    ---
-   The following example runs unbound-adblock every 3 hours at a random minute 
+   The following example runs unbound-adblock every 3 hours at a random minute
    (this avoids flooding the server with traffic at exactly XX:00)
    ---
    Run unbound-adblock every 3 hours Example:
@@ -262,7 +262,7 @@ X) If you would like to update the unbound-adblock blocklists at a more frequent
 	? */3 * * *	/usr/pkg/bin/unbound-adblock -O netbsd
 	...
 
-X) OPTIONAL -- Add the following line to your pf.conf: 
+X) OPTIONAL -- Add the following line to your pf.conf:
      NOTE: This rule intercepts DNS traffic bound for Google DNS servers.
      Google mandates the use of their DNS servers in many apps and services.
      Many devices also use hardcoded Google DNS that cannot be changed.
@@ -278,7 +278,3 @@ X) OPTIONAL -- Add the following line to your pf.conf:
 
  	-- Reload your pf rule set:
 	# pfctl -f /etc/pf.conf
-
-
-
-

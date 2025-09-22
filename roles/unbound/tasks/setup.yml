@@ -18,4 +18,6 @@
   when: >
     unbound_conf_files.matched > 0 and
     unbound_conf_stat.stat.exists == False and
-    item.path != '/etc/unbound/unbound.conf.d/00-server.conf'
+    item.path not in ['/etc/unbound/unbound.conf.d/00-server.conf',
+                      '/etc/unbound/unbound.conf.d/10-local-dns.conf.example',
+                      '/etc/unbound/unbound.conf.d/20-forward-zones.conf']

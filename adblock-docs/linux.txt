@@ -1,5 +1,5 @@
 ###################################################################
-# unbound-adblock 0.5 SystemD/Linux Installation Instructions 
+# unbound-adblock 0.5 SystemD/Linux Installation Instructions
 # Copyright 2018-2021 Jordan Geoghegan <jordan@geoghegan.ca>
 ###################################################################
 
@@ -32,7 +32,7 @@
    See release notes for a full list of compatible shells
 
 2) If something doesn't work, then the script can be easily tweaked
-   to make it work. The variables set based on OS declaration can be 
+   to make it work. The variables set based on OS declaration can be
    very easily modified to accomodate nearly any OS/setup (see man page)
 
 3) This guide assumes you know how to setup Unbound. If not,
@@ -59,7 +59,7 @@ Linux Unbound Quick Start:
 
 
 ###################################################################
-# Upgrade from unbound-adblock 0.4 
+# Upgrade from unbound-adblock 0.4
 ###################################################################
 
 1) Download updated script:
@@ -110,7 +110,7 @@ Linux Unbound Quick Start:
 	    control-enable: yes
 	    control-interface: 127.0.0.1
 	...
-  
+
    Note: unbound will need to be restarted for the changes to take effect.
 
 8) Create unbound-adblock log directory:
@@ -132,7 +132,7 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 
 
 ###################################################################
-# Fresh Installation Guide 
+# Fresh Installation Guide
 ###################################################################
 
 1) Install and configure Unbound as a local recursive DNS server
@@ -193,7 +193,7 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 
 10) Run script manually to parse and load the adblock ruleset:
 	# sudo -u _adblock unbound-adblock -O linux
-	
+
 11) Edit _adblock crontab to run unbound-adblock every night at midnight:
 	# crontab -u _adblock -e
 	...
@@ -217,9 +217,9 @@ to 'announce@geoghegan.ca' with a subject line and body of "subscribe unbound-ad
 # Post Install Notes:
 ###################################################################
 
-X) To add custom rules or enable features, or add alternate blocklists, 
+X) To add custom rules or enable features, or add alternate blocklists,
    See the "User Configuration Area" located at the top of the script.
-   This area serves as a built in config file, so please feel free to 
+   This area serves as a built in config file, so please feel free to
    edit it and experiment with all the features available within.
    ---
    Note: Most options can also be configured from the command line
@@ -228,11 +228,11 @@ X) Regarding Cron Jobs:
    Over the past year I've noticed a number of list host servers
    going down at midnight in populated timezones (ie West Coast,
    East Coast and Western Europe). To be respectful (and to avoid
-   overloading list providers servers) we have cron jobs 
+   overloading list providers servers) we have cron jobs
    scheduled to run at a random time within a defined interval.
    ---
-   With the new default cron job, unbound-adblock will be run every 
-   night at some point between midnight and 2AM, and thus 
+   With the new default cron job, unbound-adblock will be run every
+   night at some point between midnight and 2AM, and thus
    distributing the load of thousands of queries from numerous
    users over a 2 hour period rather than a matter of seconds.
 
@@ -264,4 +264,3 @@ X) Google mandates the use of their DNS servers in many apps and services
 	pass in quick to <gooDNS4> rdr-to $adblock
 	pass in quick to <gooDNS6> rdr-to $adblock6
 	...
-
