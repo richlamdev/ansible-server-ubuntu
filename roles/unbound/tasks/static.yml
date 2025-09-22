@@ -69,14 +69,20 @@
     - reload systemd
     - restart unbound
 
-- name: Deploy static Unbound files
+- name: Deploy local-dns Unbound file
   copy:
-    src: "{{ item }}"
-    dest: "/etc/unbound/unbound.conf.d/server.d/{{ item }}"
+    src: 10-local-dns.conf.example
+    dest: "/etc/unbound/unbound.conf.d/server.d/10-local-dns.conf.example"
     owner: root
     group: root
     mode: "0644"
-  loop:
-    - 10-local-dns.conf.example
-    - 20-forward-zones.conf
+  notify: reload unbound
+
+- name: Deploy forward-zone Unbound file
+  copy:
+    src: 20-forward-zones.conf
+    dest: "/etc/unbound/unbound.conf.d/20-forward-zones.conf"
+    owner: root
+    group: root
+    mode: "0644"
   notify: reload unbound

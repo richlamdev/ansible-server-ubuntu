@@ -28,4 +28,4 @@
     unbound_conf_stat.stat.exists == False and
     item.path not in ['/etc/unbound/unbound.conf.d/00-server.conf',
                       '/etc/unbound/unbound.conf.d/server.d/10-local-dns.conf.example',
-                      '/etc/unbound/unbound.conf.d/server.d/20-forward-zones.conf']
+                      '/etc/unbound/unbound.conf.d/20-forward-zones.conf']
