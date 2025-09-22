@@ -127,4 +127,8 @@ server:
 
 ## Unbound Optimization and Speed Tweaks ###
 
+        remote-control:
+        control-enable: yes
+        control-interface: 127.0.0.1
+
         include: "/etc/unbound/unbound.conf.d/server.d/*.conf"
