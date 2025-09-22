@@ -111,10 +111,10 @@
   loop_control:
     label: "Setting permissions on {{ item }}"
 
-- name: Add RPZ and remote-control configuration to unbound.conf
+- name: Add RPZ and remote-control configuration to 00-server.conf
   become: yes
   blockinfile:
-    path: /etc/unbound/unbound.conf.d/unbound.conf  # Adjust path as needed
+    path: /etc/unbound/unbound.conf.d/00-server.conf
     block: |
       # Required modules for RPZ
       module-config: "respip validator iterator"
