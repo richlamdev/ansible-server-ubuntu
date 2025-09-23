@@ -132,8 +132,8 @@
 
 - name: Deploy RPZ configuration drop-in
   copy:
-    src: 30-server-rpz.conf
-    dest: /etc/unbound/unbound.conf.d/server.d/30-server-rpz.conf
+    src: 30-rpz.conf
+    dest: /etc/unbound/unbound.conf.d/30-rpz.conf
     owner: root
     group: root
     mode: '0644'
