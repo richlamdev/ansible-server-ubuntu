@@ -71,8 +71,8 @@
 
 - name: Deploy local-dns Unbound file
   copy:
-    src: 10-server-local-dns.conf.example
-    dest: "/etc/unbound/unbound.conf.d/server.d/10-server-local-dns.conf.example"
+    src: 10-local-dns.conf.example
+    dest: "/etc/unbound/unbound.conf.d/10-local-dns.conf.example"
     owner: root
     group: root
     mode: "0644"
@@ -80,8 +80,8 @@
 
 - name: Deploy forward-zone Unbound file
   copy:
-    src: 20-top-level-forward-zones.conf
-    dest: "/etc/unbound/unbound.conf.d/20-top-level-forward-zones.conf"
+    src: 20-forward-zones.conf
+    dest: "/etc/unbound/unbound.conf.d/20-forward-zones.conf"
     owner: root
     group: root
     mode: "0644"

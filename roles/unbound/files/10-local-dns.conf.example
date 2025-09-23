@@ -2,6 +2,11 @@
 # Copy this file to 10-local-dns.conf and customize with your private records.
 # Make sure 10-local-dns.conf is gitignored to avoid exposing private data.
 
+# uncomment server: to ensure it's included as part of the top level for unbound.conf
+# server:
+
+# Ensure all entries below server: are indented four spaces.
+
 # Example local static zone
 # local-zone: "lan." static
 
