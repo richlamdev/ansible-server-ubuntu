@@ -1,12 +1,4 @@
 ---
-- name: Ensure server.d directory exists for modular drop-ins
-  file:
-    path: /etc/unbound/unbound.conf.d/server.d
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-
 - name: Find all files from /etc/unbound/unbound.conf.d
   find:
     paths: /etc/unbound/unbound.conf.d
