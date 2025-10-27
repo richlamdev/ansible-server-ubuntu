@@ -1,19 +1,21 @@
 ---
-- name: setup configuration
-  import_tasks: setup.yml
+- block:
+    - name: setup configuration
+      import_tasks: setup.yml
 
-- name: dynamic file configuration
-  import_tasks: dynamic.yml
+    - name: dynamic file configuration
+      import_tasks: dynamic.yml
 
-- name: static file configuration
-  import_tasks: static.yml
+    - name: static file configuration
+      import_tasks: static.yml
 
-- name: ufw configuration
-  import_tasks: ufw.yml
+    - name: ufw configuration
+      import_tasks: ufw.yml
 
-# Final guarantee that Unbound is enabled and running
-- name: Ensure Unbound is enabled and running
-  service:
-    name: unbound
-    state: started
-    enabled: yes
+    # Final guarantee that Unbound is enabled and running
+    - name: Ensure Unbound is enabled and running
+      service:
+        name: unbound
+        state: started
+        enabled: yes
+  tags: ['unbound']

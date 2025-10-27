@@ -1,21 +1,23 @@
 ---
-- name: apt packages tasks
-  import_tasks: apt-packages.yml
+- block:
+    - name: apt packages tasks
+      import_tasks: apt-packages.yml
 
-# - name: development tools and libraries tasks
-#   import_tasks: dev-packages.yml
+    # - name: development tools and libraries tasks
+    #   import_tasks: dev-packages.yml
 
-- name: ssh tasks
-  import_tasks: ssh.yml
+    - name: ssh tasks
+      import_tasks: ssh.yml
 
-- name: security tasks
-  import_tasks: security.yml
+    - name: security tasks
+      import_tasks: security.yml
 
-- name: optimize tasks
-  import_tasks: optimize.yml
+    - name: optimize tasks
+      import_tasks: optimize.yml
 
-- name: powersave tasks
-  import_tasks: powersave.yml
+    - name: powersave tasks
+      import_tasks: powersave.yml
 
-- name: keychron tasks
-  import_tasks: keychron.yml
+    - name: keychron tasks
+      import_tasks: keychron.yml
+  tags: ['base']
