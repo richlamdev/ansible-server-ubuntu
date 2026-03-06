@@ -1,49 +1,51 @@
 ---
-- name: Add DNSStubListener=no to /etc/systemd/resolved.conf
-  lineinfile:
-    firstmatch: true
-    path: "/etc/systemd/resolved.conf"
-    insertafter: "EOF"
-    line: "DNSStubListener=no"
-    state: present
-  register: dns_default_status
+- block:
+    - name: Add DNSStubListener=no to /etc/systemd/resolved.conf
+      lineinfile:
+        firstmatch: true
+        path: "/etc/systemd/resolved.conf"
+        insertafter: "EOF"
+        line: "DNSStubListener=no"
+        state: present
+      register: dns_default_status
 
-- name: Print dns_default_status
-  debug:
-    var: dns_default_status.changed
+    - name: Print dns_default_status
+      debug:
+        var: dns_default_status.changed
 
-- name: Ensure systemd-resolved is enabled and active
-  systemd:
-    name: systemd-resolved.service
-    enabled: true
-    state: started
+    - name: Ensure systemd-resolved is enabled and active
+      systemd:
+        name: systemd-resolved.service
+        enabled: true
+        state: started
 
-- name: Restart systemd-resolved with validation
-  command: systemctl restart systemd-resolved.service
-  register: restart_resolved
-  retries: 3
-  delay: 5
-  until: restart_resolved.rc == 0
-  when: dns_default_status.changed
+    - name: Restart systemd-resolved with validation
+      command: systemctl restart systemd-resolved.service
+      register: restart_resolved
+      retries: 3
+      delay: 5
+      until: restart_resolved.rc == 0
+      when: dns_default_status.changed
 
-- name: Ensure systemd-networkd is enabled and active
-  systemd:
-    name: systemd-networkd.service
-    enabled: true
-    state: started
+    - name: Ensure systemd-networkd is enabled and active
+      systemd:
+        name: systemd-networkd.service
+        enabled: true
+        state: started
 
-- name: Restart systemd-networkd with validation
-  command: systemctl restart systemd-networkd.service
-  register: restart_networkd
-  retries: 3
-  delay: 5
-  until: restart_networkd.rc == 0
-  when: dns_default_status.changed
+    - name: Restart systemd-networkd with validation
+      command: systemctl restart systemd-networkd.service
+      register: restart_networkd
+      retries: 3
+      delay: 5
+      until: restart_networkd.rc == 0
+      when: dns_default_status.changed
 
-- name: Ensure DNS resolution is functional
-  command: "dig example.com +short"
-  register: dns_check
-  retries: 5
-  delay: 2
-  until: dns_check.rc == 0
-  when: dns_default_status.changed
+    - name: Ensure DNS resolution is functional
+      command: "dig example.com +short"
+      register: dns_check
+      retries: 5
+      delay: 2
+      until: dns_check.rc == 0
+      when: dns_default_status.changed
+  tags: ['disable-local-dns']

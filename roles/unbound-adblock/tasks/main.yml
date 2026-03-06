@@ -1,209 +1,211 @@
 ---
-- name: Ensure _adblock user exists and add to unbound group
-  user:
-    name: "_adblock"
-    shell: /sbin/nologin
-    home: /var/empty
-    create_home: false
-    password_lock: true
-    state: present
-    groups: unbound
-    append: yes
+- block:
+    - name: Ensure _adblock user exists and add to unbound group
+      user:
+        name: "_adblock"
+        shell: /sbin/nologin
+        home: /var/empty
+        create_home: false
+        password_lock: true
+        state: present
+        groups: unbound
+        append: yes
 
-- name: Copy unbound-adblock.sh to target host
-  copy:
-    src: unbound-adblock.sh
-    dest: /usr/local/bin/unbound-adblock
-    owner: root
-    group: bin
-    mode: '0755'
+    - name: Copy unbound-adblock.sh to target host
+      copy:
+        src: unbound-adblock.sh
+        dest: /usr/local/bin/unbound-adblock
+        owner: root
+        group: bin
+        mode: '0755'
 
-- name: Ensure /etc/unbound/adblock.rpz exists with correct permissions
-  copy:
-    dest: /etc/unbound/adblock.rpz
-    content: ''
-    owner: _adblock
-    group: root
-    mode: '0644'
-    force: yes
+    - name: Ensure /etc/unbound/adblock.rpz exists with correct permissions
+      copy:
+        dest: /etc/unbound/adblock.rpz
+        content: ''
+        owner: _adblock
+        group: root
+        mode: '0644'
+        force: yes
 
-- name: Ensure /var/log/unbound-adblock directory exists
-  file:
-    path: /var/log/unbound-adblock
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
+    - name: Ensure /var/log/unbound-adblock directory exists
+      file:
+        path: /var/log/unbound-adblock
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
 
-- name: Ensure /var/log/unbound-adblock/unbound-adblock.log exists with correct permissions
-  copy:
-    dest: /var/log/unbound-adblock/unbound-adblock.log
-    content: ''
-    owner: _adblock
-    group: root
-    mode: '0640'
-    force: yes
+    - name: Ensure /var/log/unbound-adblock/unbound-adblock.log exists with correct permissions
+      copy:
+        dest: /var/log/unbound-adblock/unbound-adblock.log
+        content: ''
+        owner: _adblock
+        group: root
+        mode: '0640'
+        force: yes
 
-- name: Ensure /var/log/unbound-adblock/unbound-adblock.log.0.gz exists with correct permissions
-  copy:
-    dest: /var/log/unbound-adblock/unbound-adblock.log.0.gz
-    content: ''
-    owner: _adblock
-    group: root
-    mode: '0640'
-    force: yes
+    - name: Ensure /var/log/unbound-adblock/unbound-adblock.log.0.gz exists with correct permissions
+      copy:
+        dest: /var/log/unbound-adblock/unbound-adblock.log.0.gz
+        content: ''
+        owner: _adblock
+        group: root
+        mode: '0640'
+        force: yes
 
-- name: Grant specific sudo permissions to _adblock user for unbound-control
-  become: yes
-  lineinfile:
-    path: /etc/sudoers.d/_adblock_unbound
-    create: yes
-    line: "_adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q status"
-    owner: root
-    group: root
-    mode: '0440'
-    validate: 'visudo -cf %s'
+    - name: Grant specific sudo permissions to _adblock user for unbound-control
+      become: yes
+      lineinfile:
+        path: /etc/sudoers.d/_adblock_unbound
+        create: yes
+        line: "_adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q status"
+        owner: root
+        group: root
+        mode: '0440'
+        validate: 'visudo -cf %s'
 
-- name: Grant specific sudo permissions to _adblock user for flush_zone
-  become: yes
-  lineinfile:
-    path: /etc/sudoers.d/_adblock_unbound
-    create: yes
-    line: "_adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q flush_zone unbound-adblock"
-    owner: root
-    group: root
-    mode: '0440'
-    validate: 'visudo -cf %s'
+    - name: Grant specific sudo permissions to _adblock user for flush_zone
+      become: yes
+      lineinfile:
+        path: /etc/sudoers.d/_adblock_unbound
+        create: yes
+        line: "_adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q flush_zone unbound-adblock"
+        owner: root
+        group: root
+        mode: '0440'
+        validate: 'visudo -cf %s'
 
-- name: Grant specific sudo permissions to _adblock user for auth_zone_reload
-  become: yes
-  lineinfile:
-    path: /etc/sudoers.d/_adblock_unbound
-    create: yes
-    line: "_adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q auth_zone_reload unbound-adblock"
-    owner: root
-    group: root
-    mode: '0440'
-    validate: 'visudo -cf %s'
+    - name: Grant specific sudo permissions to _adblock user for auth_zone_reload
+      become: yes
+      lineinfile:
+        path: /etc/sudoers.d/_adblock_unbound
+        create: yes
+        line: "_adblock ALL=(root) NOPASSWD: /usr/sbin/unbound-control -q auth_zone_reload unbound-adblock"
+        owner: root
+        group: root
+        mode: '0440'
+        validate: 'visudo -cf %s'
 
-- name: Check if unbound-control.conf exists to determine if unbound-control-setup has been run
-  stat:
-    path: /etc/unbound/unbound-control.conf
-  register: unbound_control_conf
+    - name: Check if unbound-control.conf exists to determine if unbound-control-setup has been run
+      stat:
+        path: /etc/unbound/unbound-control.conf
+      register: unbound_control_conf
 
-- name: Run unbound-control-setup if unbound-control.conf does not exist
-  become: yes
-  command: unbound-control-setup
-  when: unbound_control_conf.stat.exists == False
+    - name: Run unbound-control-setup if unbound-control.conf does not exist
+      become: yes
+      command: unbound-control-setup
+      when: unbound_control_conf.stat.exists == False
 
-- name: Ensure correct ownership and permissions for unbound control key and certificate
-  file:
-    path: "{{ item }}"
-    owner: root
-    group: unbound
-    mode: '0640'
-    state: file
-  loop:
-    - /etc/unbound/unbound_control.key
-    - /etc/unbound/unbound_control.pem
-    - /etc/unbound/unbound_server.key
-    - /etc/unbound/unbound_server.pem
-  loop_control:
-    label: "Setting permissions on {{ item }}"
+    - name: Ensure correct ownership and permissions for unbound control key and certificate
+      file:
+        path: "{{ item }}"
+        owner: root
+        group: unbound
+        mode: '0640'
+        state: file
+      loop:
+        - /etc/unbound/unbound_control.key
+        - /etc/unbound/unbound_control.pem
+        - /etc/unbound/unbound_server.key
+        - /etc/unbound/unbound_server.pem
+      loop_control:
+        label: "Setting permissions on {{ item }}"
 
-# - name: Add RPZ and remote-control configuration to 00-server.conf
-#   become: yes
-#   blockinfile:
-#     path: /etc/unbound/unbound.conf.d/00-server.conf
-#     block: |
-#       # Required modules for RPZ
-#       module-config: "respip validator iterator"
-#       rpz:
-#          name: "unbound-adblock"
-#          zonefile: "/etc/unbound/adblock.rpz"
-#          rpz-log: yes
-#          rpz-log-name: "unbound-adblock"
+    # - name: Add RPZ and remote-control configuration to 00-server.conf
+    #   become: yes
+    #   blockinfile:
+    #     path: /etc/unbound/unbound.conf.d/00-server.conf
+    #     block: |
+    #       # Required modules for RPZ
+    #       module-config: "respip validator iterator"
+    #       rpz:
+    #          name: "unbound-adblock"
+    #          zonefile: "/etc/unbound/adblock.rpz"
+    #          rpz-log: yes
+    #          rpz-log-name: "unbound-adblock"
 
-#       remote-control:
-#           control-enable: yes
-#           control-interface: 127.0.0.1
-#     insertbefore: "forward-zone"  # Insert before the 'forward-zone' section
-#     create: yes
+    #       remote-control:
+    #           control-enable: yes
+    #           control-interface: 127.0.0.1
+    #     insertbefore: "forward-zone"  # Insert before the 'forward-zone' section
+    #     create: yes
 
-- name: Deploy RPZ configuration drop-in
-  copy:
-    src: 30-rpz.conf
-    dest: /etc/unbound/unbound.conf.d/30-rpz.conf
-    owner: root
-    group: root
-    mode: '0644'
+    - name: Deploy RPZ configuration drop-in
+      copy:
+        src: 30-rpz.conf
+        dest: /etc/unbound/unbound.conf.d/30-rpz.conf
+        owner: root
+        group: root
+        mode: '0644'
 
-- name: Ensure Unbound is reloaded after configuration changes
-  become: yes
-  service:
-    name: unbound
-    state: restarted
+    - name: Ensure Unbound is reloaded after configuration changes
+      become: yes
+      service:
+        name: unbound
+        state: restarted
 
-- name: Wait until Unbound is fully ready after reload
-  become: yes
-  become_user: unbound
-  command: "unbound-control status"
-  register: unbound_status
-  retries: 5
-  delay: 2
-  until: unbound_status.rc == 0
-  failed_when: "'error:' in unbound_status.stderr"
-  changed_when: false
+    - name: Wait until Unbound is fully ready after reload
+      become: yes
+      become_user: unbound
+      command: "unbound-control status"
+      register: unbound_status
+      retries: 5
+      delay: 2
+      until: unbound_status.rc == 0
+      failed_when: "'error:' in unbound_status.stderr"
+      changed_when: false
 
-- name: Run the unbound-adblock script to parse and load the adblock ruleset
-  become: yes
-  become_user: _adblock
-  command: "/usr/local/bin/unbound-adblock -O linux"
-  environment:
-    HOME: /var/empty  # Ensure the home directory is set to the correct location for _adblock user
+    - name: Run the unbound-adblock script to parse and load the adblock ruleset
+      become: yes
+      become_user: _adblock
+      command: "/usr/local/bin/unbound-adblock -O linux"
+      environment:
+        HOME: /var/empty  # Ensure the home directory is set to the correct location for _adblock user
 
-- name: Add a cron job for _adblock to run unbound-adblock every morning at 5:30 AM
-  become: yes
-  cron:
-    name: "Run unbound-adblock"
-    user: "_adblock"
-    minute: "30"
-    hour: "5"
-    job: "/usr/local/bin/unbound-adblock -O linux"
-    state: present
+    - name: Add a cron job for _adblock to run unbound-adblock every morning at 5:30 AM
+      become: yes
+      cron:
+        name: "Run unbound-adblock"
+        user: "_adblock"
+        minute: "30"
+        hour: "5"
+        job: "/usr/local/bin/unbound-adblock -O linux"
+        state: present
 
-- name: Ensure the logrotate directory exists
-  file:
-    path: /etc/logrotate.d
-    state: directory
-    mode: 0755
+    - name: Ensure the logrotate directory exists
+      file:
+        path: /etc/logrotate.d
+        state: directory
+        mode: 0755
 
-- name: Create logrotate configuration for unbound-adblock
-  copy:
-    dest: /etc/logrotate.d/unbound-adblock
-    content: |
-      /var/log/unbound-adblock/unbound-adblock.log {
-          daily
-          rotate 7
-          compress
-          notifempty
-          missingok
-          create 0640 _adblock root
-          postrotate
-              systemctl reload unbound > /dev/null 2>/dev/null || true
-          endscript
-      }
-    owner: root
-    group: root
-    mode: '0644'
+    - name: Create logrotate configuration for unbound-adblock
+      copy:
+        dest: /etc/logrotate.d/unbound-adblock
+        content: |
+          /var/log/unbound-adblock/unbound-adblock.log {
+              daily
+              rotate 7
+              compress
+              notifempty
+              missingok
+              create 0640 _adblock root
+              postrotate
+                  systemctl reload unbound > /dev/null 2>/dev/null || true
+              endscript
+          }
+        owner: root
+        group: root
+        mode: '0644'
 
-- name: Test logrotate configuration
-  command: logrotate --debug /etc/logrotate.conf
-  register: logrotate_test
-  changed_when: false
-  failed_when: logrotate_test.stderr != ''
-  ignore_errors: true
+    - name: Test logrotate configuration
+      command: logrotate --debug /etc/logrotate.conf
+      register: logrotate_test
+      changed_when: false
+      failed_when: logrotate_test.stderr != ''
+      ignore_errors: true
 
-- name: Print logrotate test output
-  debug:
-    var: logrotate_test.stdout
+    - name: Print logrotate test output
+      debug:
+        var: logrotate_test.stdout
+  tags: ['unbound-adblock']
