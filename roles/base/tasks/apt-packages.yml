@@ -5,22 +5,32 @@
     upgrade: dist
 
 # keep alphabetically ordered
+- name: packages | define base packages
+  set_fact:
+    base_packages:
+      - clamav
+      - clamav-daemon
+      - dnsutils
+      - fd-find
+      - tmux
+      - tree
+      - ufw
+      - vim
+
 - name: packages | install standard additions to the base install
   apt:
+    name: "{{ base_packages }}"
     state: latest
-    pkg: "{{ item }}"
-  loop:
-    - clamav
-    - clamav-daemon
-    - dnsutils
-    - fd-find
-    - tmux
-    - tree
-    - ufw
-    - vim
-  loop_control:
-    label: "{{ item }}"
-  become: yes
+  register: _apt_result
+
+- name: packages | managed package list
+  debug:
+    msg: "{{ base_packages }}"
+
+- name: packages | show what changed
+  debug:
+    msg: "{{ _apt_result.stdout_lines }}"
+  when: _apt_result.changed
 
 - name: packages | apt autoremove & autoclean
   apt:
