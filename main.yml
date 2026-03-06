@@ -5,16 +5,16 @@
   become_user: root
   become_method: sudo
   gather_facts: true
-  vars_files:
-    - vars.yml
+  pre_tasks:
+    - name: resolve remote user facts
+      ansible.builtin.include_tasks: resolve_user.yml
+      tags: always
 
   roles:
     - auto-update
     - base
     - unbound
     - unbound-adblock
-      #- role: vim
-      #become: false
-    - role: env
-      become: false
+    - vim # executes as local user, not root
+    - env # executes as local user, not root
     - disable-local-dns

@@ -43,3 +43,4 @@
       shell: "/{{ home_dir }}/.fzf/install --key-bindings --completion --no-update-rc"
       when: fzf_installed.rc != 0
   tags: ['env']
+  become: false
