@@ -1,15 +1,26 @@
 ---
 - name: Ensure development packages and libraries are installed
-  apt:
-    state: latest
-    pkg: "{{ item }}"
-  loop:
+  set_fact:
+    dev_packages:
     - pipx
     - shellcheck
     - shfmt
     - universal-ctags
-  loop_control:
-    label: "{{ item }}"
+
+- name: register dev tools pacakages
+  apt:
+    state: latest
+    name: "{{ dev_packages }}"
+  register: _apt_dev_result
+
+- name: display dev tools
+  debug:
+    msg: "{{ dev_packages }}"
+
+- name: dev tools | show what changed
+  debug:
+    msg "{{ _apt_dev_result.stdout_lines }}"
+  when: _apt_dev_result.changed
 
 - name: install development tools
   community.general.pipx:
