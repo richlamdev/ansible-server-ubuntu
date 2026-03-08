@@ -1,5 +1,13 @@
 ---
 - block:
+    - name: ensure .bashrc.d directory exists in user's home
+      file:
+        path: "{{ home_dir }}/.bashrc.d"
+        state: directory
+        owner: "{{ local_user }}"
+        group: "{{ local_user_primary_group }}"
+        mode: "0750"
+
     - name: install custom_bash.sh / git_bash_ps1.sh to home .bashrc.d directory
       copy:
         src: "{{ item }}"

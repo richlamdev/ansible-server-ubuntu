@@ -13,8 +13,9 @@
   roles:
     - auto-update
     - base
+    - unattended-upgrade-override
     - unbound
     - unbound-adblock
-    - vim # executes as local user, not root
+    #- vim # executes as local user, not root
     - env # executes as local user, not root
     - disable-local-dns
