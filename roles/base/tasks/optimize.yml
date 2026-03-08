@@ -15,7 +15,6 @@
   apt:
     autoremove: true
     autoclean: true
-  #when: snaps_found.stdout | length > 0
 
 - name: Check if Evolution files exist
   stat:
