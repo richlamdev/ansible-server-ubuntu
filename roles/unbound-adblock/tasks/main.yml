@@ -199,13 +199,12 @@
         mode: '0644'
 
     - name: Test logrotate configuration
-      command: logrotate --debug /etc/logrotate.conf
+      command: logrotate --debug /etc/logrotate.d/unbound-adblock
       register: logrotate_test
       changed_when: false
-      failed_when: logrotate_test.stderr != ''
-      ignore_errors: true
+      failed_when: logrotate_test.rc != 0
 
     - name: Print logrotate test output
       debug:
-        var: logrotate_test.stdout
+        var: logrotate_test.stderr
   tags: ['unbound-adblock']
