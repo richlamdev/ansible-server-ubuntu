@@ -2,10 +2,16 @@
 - name: Reload systemd
   ansible.builtin.command: systemctl daemon-reload
   become: true
+  changed_when: false
 
-- name: Restart apt-daily-upgrade.timer
+- name: Reset failed state (if any)
+  ansible.builtin.command: systemctl reset-failed apt-daily-upgrade.timer
+  become: true
+  changed_when: false
+
+- name: Ensure timer is active
   ansible.builtin.systemd:
     name: apt-daily-upgrade.timer
-    state: restarted
+    state: started
     enabled: true
   become: true
