@@ -1,21 +1,29 @@
 ---
-- name: Update APT package cache
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600  # Cache is valid for 1 hour
+- name: set unbound packages list
+  set_fact:
+    unbound_packages:
+      - unbound
+      - unbound-anchor
+      - ca-certificates
 
-- name: Install Unbound and ca-certificates
+- name: register unbound packages
   apt:
-    name: "{{ item }}"
+    name: "{{ unbound_packages }}"
     state: present
-  loop:
-    - unbound
-    - unbound-anchor
-    - ca-certificates
-  loop_control:
-    label: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+  register: _unbound_packages_result
 
-- name: Ensure /var/lib/unbound directory exists
+- name: display intended unbound packages
+  debug:
+    msg: "{{ unbound_packages }}"
+
+- name: show installed unbound packages
+  debug:
+    msg: "{{ _unbound_packages_result.stdout }}"
+  when: _unbound_packages_result.changed
+
+- name: ensure /var/lib/unbound directory exists
   file:
     path: /var/lib/unbound
     state: directory
@@ -23,7 +31,7 @@
     group: unbound
     mode: '0755'
 
-- name: Download the latest root.hints file
+- name: download the latest root.hints file
   get_url:
     url: https://www.internic.net/domain/named.root
     dest: /var/lib/unbound/root.hints
@@ -32,13 +40,13 @@
     mode: '0644'
     force: yes
 
-- name: Install root.key from IANA using unbound-anchor
+- name: install root.key from IANA using unbound-anchor
   shell: '/usr/sbin/unbound-anchor -a /var/lib/unbound/root.key'
   register: rootkey
   failed_when: rootkey.rc not in [0, 1]
   changed_when: "'success' in rootkey.stdout or rootkey.rc == 0"
 
-- name: Change ownership and group of root.key to unbound
+- name: change ownership and group of root.key to unbound
   file:
     path: /var/lib/unbound/root.key
     owner: unbound
@@ -46,7 +54,7 @@
     mode: '0640'
   when: rootkey.rc in [0, 1]
 
-- name: Create Unbound systemd override directory
+- name: create unbound systemd override directory
   file:
     path: /etc/systemd/system/unbound.service.d
     state: directory
@@ -54,7 +62,7 @@
     owner: root
     group: root
 
-- name: Configure Unbound systemd service override file
+- name: configure unbound systemd service override file
   copy:
     dest: /etc/systemd/system/unbound.service.d/override.conf
     content: |
@@ -69,7 +77,7 @@
     - reload systemd
     - restart unbound
 
-- name: Deploy local-dns Unbound file
+- name: deploy local-dns Unbound file
   copy:
     src: 10-local-dns.conf.example
     dest: "/etc/unbound/unbound.conf.d/10-local-dns.conf.example"
@@ -78,7 +86,7 @@
     mode: "0644"
   notify: reload unbound
 
-- name: Deploy forward-zone Unbound file
+- name: deploy forward-zone Unbound file
   copy:
     src: 20-forward-zones.conf
     dest: "/etc/unbound/unbound.conf.d/20-forward-zones.conf"
