@@ -29,5 +29,6 @@
         mode: '0644'
       notify:
         - Reload systemd
-        - Restart apt-daily-upgrade.timer
+        - Restart failed state (if any)
+        - Ensure timer is active
   tags: ['unattended-upgrade-override']

@@ -11,7 +11,7 @@
       tags: always
 
   roles:
-    - auto-update
+    - apt-sources-ubc
     - base
     - unattended-upgrade-override
     - unbound
