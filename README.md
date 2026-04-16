@@ -88,8 +88,8 @@ The majority of roles are self explantory in terms of what they install.
 
 Additional information for the following roles:
 
-* apt-sources-ubc
-  * adds University of BC (UBC) as primary apt source
+* apt-sources-arcustech
+  * adds arcustech as primary apt source
   * this is a personal preference for me
   * find your fastest/closest mirror [here](https://launchpad.net/ubuntu/+archivemirrors)
 

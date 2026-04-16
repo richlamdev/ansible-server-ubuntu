@@ -18,4 +18,4 @@
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: yes
-  tags: ['apt-sources-ubc']
+  tags: ['apt-sources-arcustech']
