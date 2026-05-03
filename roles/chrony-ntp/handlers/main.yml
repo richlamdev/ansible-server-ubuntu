@@ -1,0 +1,9 @@
+---
+- name: Restart chrony
+  ansible.builtin.systemd:
+    name: chrony
+    state: restarted
+
+- name: Reload UFW
+  community.general.ufw:
+    state: reloaded

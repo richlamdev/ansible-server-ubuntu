@@ -1,0 +1,50 @@
+# chrony.conf — managed by Ansible (role: ntp_server)
+# Do not edit manually.
+
+# ── Upstream sources ────────────────────────────────────────────────────────
+{% for server in ntp_upstream_servers %}
+server {{ server }}
+{% endfor %}
+
+# ── NTS key/certificate storage (chrony manages this automatically) ─────────
+{% if ntp_enable_nts %}
+ntsdumpdir /var/lib/chrony
+{% endif %}
+
+# ── Drift file — persist frequency correction across reboots ────────────────
+driftfile /var/lib/chrony/drift
+
+# ── Step the clock on large offsets (first 3 clock updates only) ────────────
+makestep 1.0 3
+
+# ── Kernel sync — keep kernel clock in sync with chrony ─────────────────────
+rtcsync
+
+# ── Local stratum fallback ───────────────────────────────────────────────────
+# Advertise as stratum {{ ntp_local_stratum }} if upstream is unreachable.
+# Prevents clients from treating an unsynced server as authoritative.
+local stratum {{ ntp_local_stratum }}
+
+# ── Access control — serve NTP to LAN clients ───────────────────────────────
+{% for network in ntp_allow_networks %}
+allow {{ network }}
+{% endfor %}
+
+# ── Logging ──────────────────────────────────────────────────────────────────
+logdir /var/log/chrony
+log measurements statistics tracking
+
+# ── Security hardening ───────────────────────────────────────────────────────
+# Lock chrony to its own user (default in Ubuntu packages)
+# Bind only to localhost for control socket
+bindcmdaddress 127.0.0.1
+bindcmdaddress ::1
+
+# Disable chronyc remote management (cmdallow is localhost-only by default)
+# cmdallow 127.0.0.1  # already the default; listed here for clarity
+
+# Reduce amplification attack surface
+# noclientlog disables per-client stats (saves memory on busy servers)
+noclientlog
+
+# vim:ft=yaml.jinja2:
