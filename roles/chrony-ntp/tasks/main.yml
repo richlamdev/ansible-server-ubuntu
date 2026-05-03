@@ -1,0 +1,59 @@
+---
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ ntp_timezone }}"
+  when: ntp_timezone | length > 0
+  notify: Restart chrony
+
+- name: Install chrony
+  ansible.builtin.apt:
+    name: chrony
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Disable systemd-timesyncd (conflicts with chrony)
+  ansible.builtin.systemd:
+    name: systemd-timesyncd
+    state: stopped
+    enabled: false
+    masked: true
+  # timesyncd may not exist on minimal installs; ignore if absent
+  failed_when: false
+
+- name: Deploy chrony configuration
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+  notify: Restart chrony
+
+- name: Enable and start chrony
+  ansible.builtin.systemd:
+    name: chrony
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Allow NTP from LAN clients (UFW, UDP 123)
+  community.general.ufw:
+    rule: allow
+    port: "123"
+    proto: udp
+    src: "{{ item }}"
+    comment: "NTP server - chrony"
+  loop: "{{ ntp_ufw_sources }}"
+  notify: Reload UFW
+
+- name: Verify chrony is tracking upstream
+  ansible.builtin.command: chronyc tracking
+  register: chrony_tracking
+  changed_when: false
+  check_mode: false
+
+- name: Show chrony tracking status
+  ansible.builtin.debug:
+    var: chrony_tracking.stdout_lines

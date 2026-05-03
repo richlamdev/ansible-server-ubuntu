@@ -1,0 +1,27 @@
+---
+# Upstream NTP servers — using Canadian/global NTS-capable pool
+# NTS requires chrony >= 4.0 (Ubuntu 22.04+: chrony 4.x ships in repos)
+ntp_upstream_servers:
+  - "time.cloudflare.com iburst nts"
+  - "ntppool1.time.nl iburst nts"
+  - "0.ca.pool.ntp.org iburst"          # fallback without NTS
+  - "1.ca.pool.ntp.org iburst"
+
+# Network(s) allowed to query this server for NTP
+# Set to your LAN CIDR(s); supports multiple entries
+ntp_allow_networks:
+  - "192.168.0.0/16"
+
+# Stratum to advertise when not synced to upstream
+# (prevents clients relying on an unsynced clock)
+ntp_local_stratum: 10
+
+# Whether to enable NTS for upstream sync
+ntp_enable_nts: true
+
+# UFW: allow NTP from these source CIDRs
+# Matches ntp_allow_networks by default; override if needed
+ntp_ufw_sources: "{{ ntp_allow_networks }}"
+
+# Timezone for the server (leave empty to skip)
+ntp_timezone: "America/Vancouver"
