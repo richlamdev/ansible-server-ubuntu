@@ -1,9 +1,17 @@
 ---
 - block:
+    - name: Get current timezone
+      ansible.builtin.command: timedatectl show --property=Timezone --value
+      register: current_timezone
+      changed_when: false
+      check_mode: false
+
     - name: Set timezone
       community.general.timezone:
         name: "{{ ntp_timezone }}"
-      when: ntp_timezone | length > 0
+      when:
+        - ntp_timezone | length > 0
+        - current_timezone.stdout != ntp_timezone
       notify: Restart chrony
 
     - name: Install chrony
@@ -19,7 +27,6 @@
         state: stopped
         enabled: false
         masked: true
-      # timesyncd may not exist on minimal installs; ignore if absent
       failed_when: false
       changed_when: false
 
