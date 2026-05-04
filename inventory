@@ -12,3 +12,5 @@ ansible_python_interpreter=/usr/bin/python3
 #ansible_become=True
 #ansible_become_method=sudo
 #ansible_become_user=root
+
+# vim: set filetype=dosini :
